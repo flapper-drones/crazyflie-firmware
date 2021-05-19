@@ -62,7 +62,7 @@ static void positionEstimateInternal(state_t* estimate, const baro_t* baro, cons
 static void positionUpdateVelocityInternal(float accWZ, float dt, struct selfState_s* state);
 
 void positionEstimate(state_t* estimate, const baro_t* baro, const tofMeasurement_t* tofMeasurement, float dt, uint32_t tick) {
-  positionEstimateInternal(estimate, sensorData, tofMeasurement, dt, tick, &state);
+  positionEstimateInternal(estimate, baro, tofMeasurement, dt, tick, &state);
 }
 
 void positionUpdateVelocity(float accWZ, float dt) {
