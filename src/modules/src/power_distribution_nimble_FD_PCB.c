@@ -76,6 +76,11 @@ void powerDistributionInit(void)
   // servoTrims.roll = 0.0;
   // servoTrims.pitch = 0.12;
   // servoTrims.yaw = 0.05;
+
+  // //values used for Remco: #19
+  // servoTrims.roll = 0.0;
+  // servoTrims.pitch = 0.15;
+  // servoTrims.yaw = 0.05;
 }
 
 bool powerDistributionTest(void)
@@ -113,6 +118,7 @@ void powerDistribution(const control_t *control)
   // Trims Guillermo
   // static float pitch_trim = 0.15; // positive --> positive dihedral in forward flight
   // static float yaw_trim = -0.05; // positive is CW viewed from the top
+  
  
   static int16_t act_max = 32767;
   
