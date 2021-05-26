@@ -61,6 +61,7 @@ static struct {
 void powerDistributionInit(void)
 {
   motorsInit(platformConfigGetMotorMapping());
+  DEBUG_PRINT("Using Flapper Drone power distribution\n");
   
   // values used for MAVLab order: #10, #14, #18
   servoTrims.roll = 0.0;
@@ -105,29 +106,14 @@ void powerStop()
 void powerDistribution(const control_t *control)
 {
   static float pitch_ampl = 0.4; // 1 = full servo stroke
-  // static float roll_trim = 0;
-  // Trims James
-  // static float pitch_trim = 0.23;
-  // static float yaw_trim = -0.05; // positive is CW viewed from the top
-  // Trims Sara
-  // static float pitch_trim = -0.23;
-  // static float yaw_trim = -0.05; // positive is CW viewed from the top
-  // Trims Matej
-  // static float pitch_trim = -0.1; // positive --> positive dihedral in forward flight
-  // static float yaw_trim = 0.05; // positive is CW viewed from the top
-  // Trims Guillermo
-  // static float pitch_trim = 0.15; // positive --> positive dihedral in forward flight
-  // static float yaw_trim = -0.05; // positive is CW viewed from the top
-  
- 
-  static int16_t act_max = 32767;
+  static uint16_t act_max = 32767;
   
   motorPower.m2 = limitThrust(act_max * (1 + servoTrims.pitch) + pitch_ampl*control->pitch); // pitch servo
   motorPower.m3 = limitThrust(act_max * (1 + servoTrims.yaw) - control->yaw); // yaw servo
   
   motorPower.m1 = limitThrust( 0.5f * control->roll + control->thrust * (1 + servoTrims.roll) ); // left motor
   motorPower.m4 = limitThrust(-0.5f * control->roll + control->thrust * (1 - servoTrims.roll) ); // right motor
-  
+
   if (motorSetEnable)
   {
     motorsSetRatio(MOTOR_M1, motorPowerSet.m1);

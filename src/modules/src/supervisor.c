@@ -79,7 +79,10 @@ static bool isFlyingCheck()
 {
   int sumRatio = 0;
   for (int i = 0; i < NBR_OF_MOTORS; ++i) {
-    sumRatio += motorsGetRatio(i);
+    if (i == 0 || i == 3) // TODO: create a list of propulsion motors and check only those
+    {
+      sumRatio += motorsGetRatio(i);
+    }
   }
 
   return sumRatio > SUPERVISOR_FLIGHT_THRESHOLD;
@@ -100,7 +103,7 @@ static bool isTumbledCheck(const sensorData_t *data)
   // We need a SUPERVISOR_HYSTERESIS_THRESHOLD amount of readings that indicate
   // that we are tumbled before we act on it. This is to reduce false positives.
   //
-  if (data->acc.z <= tolerance) {
+  if (-data->acc.x <= tolerance) {
     hysteresis++;
     if (hysteresis > SUPERVISOR_HYSTERESIS_THRESHOLD) {
       return true;
