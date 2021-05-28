@@ -68,46 +68,41 @@ void powerDistributionInit(void)
   // servoTrims.pitch = 0.0;
   // servoTrims.yaw = 0.05;
 
+  // // values used for MAVLab order: #09
+  servoTrims.roll = 0.0;
+  servoTrims.pitch = -0.15;
+  servoTrims.yaw = 0.0;
+
   // values used for MAVLab order: #11
   // servoTrims.roll = 0.0;
   // servoTrims.pitch = 0.2;
   // servoTrims.yaw = 0.05;
+
+  // values used for MAVLab order: #12
+  servoTrims.roll = 0.0;
+  servoTrims.pitch = -0.2;
+  servoTrims.yaw = 0.1;
+
+  // // values used for MAVLab order: #15
+  // servoTrims.roll = 0.0;
+  // servoTrims.pitch = 0.1;
+  // servoTrims.yaw = 0.15;
+
+  // values used for MAVLab order: #16
+  servoTrims.roll = 0.0;
+  servoTrims.pitch = 0.08;
+  servoTrims.yaw = 0.0;
+
+// // values used for MAVLab order: #17
+//   servoTrims.roll = 0.0;
+//   servoTrims.pitch = -0.07;
+//   servoTrims.yaw = 0.15;
 
   // // values used for MAVLab order: #19
   // servoTrims.roll = 0.0;
   // servoTrims.pitch = -0.22;
   // servoTrims.yaw = 0.1;
 
-  // // values used for MAVLab order: #12
-  // servoTrims.roll = 0.0;
-  // servoTrims.pitch = -0.2;
-  // servoTrims.yaw = 0.1;
-
-  // // values used for MAVLab order: #16
-  servoTrims.roll = 0.0;
-  servoTrims.pitch = 0.13;
-  servoTrims.yaw = 0.0;
-
-
-  // // values used for MAVLab order: #17
-  // servoTrims.roll = 0.0;
-  // servoTrims.pitch = -0.05;
-  // servoTrims.yaw = 0.1;
-
-  // servoTrims.roll = 0.0;
-  // servoTrims.pitch = 0.0;
-  // servoTrims.yaw = 0.0;
-
-  
-  // values used for Memo: #12
-  // servoTrims.roll = 0.0;
-  // servoTrims.pitch = 0.12;
-  // servoTrims.yaw = 0.05;
-
-  // //values used for Remco: #19
-  // servoTrims.roll = 0.0;
-  // servoTrims.pitch = 0.15;
-  // servoTrims.yaw = 0.05;
 }
 
 bool powerDistributionTest(void)
