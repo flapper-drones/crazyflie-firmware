@@ -8,11 +8,11 @@ POWER_DISTRIBUTION = nimble_FD_PCB
 
 # CFLAGS += -DPOWER_MOTORS_AT_STARTUP
 
-CFLAGS += -DMOTOR_M2_STARTUP=32767
-CFLAGS += -DMOTOR_M3_STARTUP=32767
+CFLAGS += -DMOTOR_M2_NEUTRAL=32767 # pitch servo
+CFLAGS += -DMOTOR_M3_NEUTRAL=32767 # yaw servo
 
-CFLAGS += -DDECK_FORCE=bcUSD # force the SD card deck
-# CFLAGS += -DDECK_FORCE=bcCPPM # force the CCPM deck
+# CFLAGS += -DDECK_FORCE=bcUSD # force the SD card deck
+CFLAGS += -DDECK_FORCE=bcCPPM # force the CCPM deck
 # CFLAGS += -DEXTRX_BETA_FPV_RADIO # channel mapping for BetaFPV Radio Lite 2
 
 # CFLAGS += -DDECK_FORCE=bcUSD:bcLedRing # force the SD card deck and the LED Ring deck

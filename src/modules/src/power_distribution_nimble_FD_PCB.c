@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * power_distribution_nimble.c - Crazyflie stock power distribution code
+ * power_distribution_nimble_FD_PCB.c - Crazyflie stock power distribution code
  */
 #define DEBUG_MODULE "PWR_DIST"
 
@@ -35,6 +35,7 @@
 #include "motors.h"
 #include "debug.h"
 #include "math.h"
+#include "configblock.h"
 
 static bool motorSetEnable = false;
 
@@ -58,40 +59,61 @@ static struct {
   float yaw;
 } servoTrims;
 
+static uint16_t act_max = 32767;
+
 void powerDistributionInit(void)
+
 {
+  
+  #ifndef MOTOR_M1_NEUTRAL
+    #define MOTOR_M1_NEUTRAL 0
+  #endif
+  #ifndef MOTOR_M2_NEUTRAL
+    #define MOTOR_M2_NEUTRAL 0
+  #endif
+  #ifndef MOTOR_M3_NEUTRAL
+    #define MOTOR_M3_NEUTRAL 0
+  #endif
+  #ifndef MOTOR_M4_NEUTRAL
+    #define MOTOR_M4_NEUTRAL 0
+  #endif
+
   motorsInit(platformConfigGetMotorMapping());
   DEBUG_PRINT("Using Flapper Drone power distribution\n");
   
+  servoTrims.roll = 0.0;
+  servoTrims.pitch = 0.0;
+  servoTrims.yaw = 0.0;
+
   // // values used for MAVLab order: #10, #14, #18
   // servoTrims.roll = 0.0;
   // servoTrims.pitch = 0.0;
   // servoTrims.yaw = 0.05;
 
   // // values used for MAVLab order: #09
-  servoTrims.roll = 0.0;
-  servoTrims.pitch = -0.15;
-  servoTrims.yaw = 0.0;
+  // servoTrims.roll = 0.0;
+  // servoTrims.pitch = -0.15;
+  // servoTrims.yaw = 0.0;
 
-  // values used for MAVLab order: #11
+  // // values used for MAVLab order: #11
   // servoTrims.roll = 0.0;
   // servoTrims.pitch = 0.2;
   // servoTrims.yaw = 0.05;
 
-  // values used for MAVLab order: #12
-  servoTrims.roll = 0.0;
-  servoTrims.pitch = -0.2;
-  servoTrims.yaw = 0.1;
+  // // values used for MAVLab order: #12
+  // servoTrims.roll = 0.0;
+  // servoTrims.pitch = -0.2;
+  // servoTrims.yaw = 0.1;
 
   // // values used for MAVLab order: #15
   // servoTrims.roll = 0.0;
   // servoTrims.pitch = 0.1;
   // servoTrims.yaw = 0.15;
 
-  // values used for MAVLab order: #16
-  servoTrims.roll = 0.0;
-  servoTrims.pitch = 0.08;
-  servoTrims.yaw = 0.0;
+  // // values used for MAVLab order: #16
+  // servoTrims.roll = 0.0;
+  // servoTrims.pitch = 0.08;
+  // servoTrims.yaw = 0.0;
 
 // // values used for MAVLab order: #17
 //   servoTrims.roll = 0.0;
@@ -102,6 +124,8 @@ void powerDistributionInit(void)
   // servoTrims.roll = 0.0;
   // servoTrims.pitch = -0.22;
   // servoTrims.yaw = 0.1;
+
+  // servoTrims.pitch = configblockGetCalibPitch()/10;
 
 }
 
@@ -118,19 +142,18 @@ bool powerDistributionTest(void)
 
 void powerStop()
 {
-  motorsSetRatio(MOTOR_M1, 0);
-  motorsSetRatio(MOTOR_M2, 32767);
-  motorsSetRatio(MOTOR_M3, 32767);
-  motorsSetRatio(MOTOR_M4, 0);
+  motorsSetRatio(MOTOR_M1, MOTOR_M1_NEUTRAL);
+  motorsSetRatio(MOTOR_M2, MOTOR_M2_NEUTRAL + servoTrims.pitch*act_max);
+  motorsSetRatio(MOTOR_M3, MOTOR_M3_NEUTRAL + servoTrims.yaw*act_max);
+  motorsSetRatio(MOTOR_M4, MOTOR_M4_NEUTRAL);
 }
 
 void powerDistribution(const control_t *control)
 {
   static float pitch_ampl = 0.4; // 1 = full servo stroke
-  static uint16_t act_max = 32767;
   
-  motorPower.m2 = limitThrust(act_max * (1 + servoTrims.pitch) + pitch_ampl*control->pitch); // pitch servo
-  motorPower.m3 = limitThrust(act_max * (1 + servoTrims.yaw) - control->yaw); // yaw servo
+  motorPower.m2 = limitThrust(MOTOR_M2_NEUTRAL + servoTrims.pitch*act_max + pitch_ampl*control->pitch); // pitch servo
+  motorPower.m3 = limitThrust(MOTOR_M3_NEUTRAL + servoTrims.yaw*act_max - control->yaw); // yaw servo
   
   motorPower.m1 = limitThrust( 0.5f * control->roll + control->thrust * (1 + servoTrims.roll) ); // left motor
   motorPower.m4 = limitThrust(-0.5f * control->roll + control->thrust * (1 - servoTrims.roll) ); // right motor
