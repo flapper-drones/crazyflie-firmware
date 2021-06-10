@@ -23,11 +23,4 @@ current_platform.mk
 
 /docs/.jekyll-metadata
 docs/.jekyll-cache
-.vs/CMake Overview
-*.db
-*.db-shm
-*.db-wal
-*.opendb
-*.json
-*.sqlite
 
