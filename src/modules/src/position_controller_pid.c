@@ -566,6 +566,11 @@ PARAM_ADD(PARAM_FLOAT, vxKFF, &kFFx)
  */
 PARAM_ADD(PARAM_FLOAT, vyKFF, &kFFy)
 
+/**
+ * @brief Cutoff frequency for the velocity PID filter in the body Z direction
+ */
+PARAM_ADD(PARAM_FLOAT, vZcutoff, &velZFiltCutoff)
+
 PARAM_GROUP_STOP(velCtlPid)
 
 /**
