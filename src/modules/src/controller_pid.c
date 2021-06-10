@@ -29,8 +29,6 @@ static float r_pitch;
 static float r_yaw;
 static float accelz;
 
-bool flying = 0;
-
 void controllerPidInit(void)
 {
   attitudeControllerInit(ATTITUDE_UPDATE_DT);
@@ -159,22 +157,12 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
     cmd_roll = control->roll;
     cmd_pitch = control->pitch;
     cmd_yaw = control->yaw;
-
-    if (flying == 1) 
-    { 
-      positionControllerInit();
-      flying = 0;
-    }
     
     attitudeControllerResetAllPID();
     positionControllerResetAllPID();
 
     // Reset the calculated YAW angle for rate control
     attitudeDesired.yaw = state->attitude.yaw;
-  }
-  else
-  {
-    flying = 1;
   }
   
 }
