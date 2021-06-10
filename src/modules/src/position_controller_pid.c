@@ -96,7 +96,7 @@ float setpointvy = 0.0f;
 
 #define ZPOSITION_LPF_CUTOFF_FREQ 5.0f
 #define ZPOSITION_LPF_ENABLE false
-#define ZVELOCITY_LPF_CUTOFF_FREQ 10.0f
+#define ZVELOCITY_LPF_CUTOFF_FREQ 0.7f // 10.0f with Lighthouse
 #define ZVELOCITY_LPF_ENABLE true
 
 #define POSITION_CONTROL_IN_BODY true
@@ -134,9 +134,9 @@ static struct this_s this = {
 
   .pidVZ = {
     .init = {
-      .kp = 12.5f,
-      .ki = 0.5f,
-      .kd = 0.0f,
+      .kp = 12.5f, // 3.0f CF with baro
+      .ki = 0.5f, // 1.0f CF with baro
+      .kd = 0.0f, // 1.5f CF wit baro
     },
     .pid.dt = DT,
   },
@@ -188,7 +188,7 @@ void positionControllerInit()
   pidInit(&this.pidVY.pid, this.pidVY.setpoint, this.pidVY.init.kp, this.pidVY.init.ki, this.pidVY.init.kd,
       this.pidVY.pid.dt, POSITION_RATE, velFiltCutoff, velFiltEnable);
   pidInit(&this.pidVZ.pid, this.pidVZ.setpoint, this.pidVZ.init.kp, this.pidVZ.init.ki, this.pidVZ.init.kd,
-      this.pidVZ.pid.dt, POSITION_RATE, velFiltCutoff, velZFiltEnable);
+      this.pidVZ.pid.dt, POSITION_RATE, velZFiltCutoff, velZFiltEnable);
 }
 
 static float runPid(float input, struct pidAxis_s *axis, float setpoint, float dt) {
@@ -401,6 +401,15 @@ void positionControllerResetAllPID()
   pidReset(&this.pidVX.pid);
   pidReset(&this.pidVY.pid);
   pidReset(&this.pidVZ.pid);
+}
+
+void positionControllerResetAllfilters() {
+  filterReset(&this.pidX.pid, POSITION_RATE, posFiltCutoff, posFiltEnable);
+  filterReset(&this.pidY.pid, POSITION_RATE, posFiltCutoff, posFiltEnable);
+  filterReset(&this.pidZ.pid, POSITION_RATE, posFiltCutoff, posZFiltEnable);
+  filterReset(&this.pidVX.pid, POSITION_RATE, velFiltCutoff, velFiltEnable);
+  filterReset(&this.pidVY.pid, POSITION_RATE, velFiltCutoff, velFiltEnable);
+  filterReset(&this.pidVZ.pid, POSITION_RATE, velZFiltCutoff, velZFiltEnable);
 }
 
 LOG_GROUP_START(posCtl)

@@ -70,12 +70,7 @@ float pidUpdate(PidObject* pid, const float measured, const bool updateError)
     // filter out too large changes, e.g. when yaw goes from -180deg to 180deg
     if (fabs(pid->error - pid->prevError) > 180) deriv = 0;
 
-    // if (pid->enableDFilter)
-    // {
-    //   pid->deriv = lpf2pApply(&pid->dFilter, deriv);
-    // } else {
     pid->deriv = deriv;
-    // }
     if (isnan(pid->deriv)) {
       pid->deriv = 0;
     }
@@ -122,6 +117,14 @@ void pidReset(PidObject* pid)
   pid->prevError = 0;
   pid->integ     = 0;
   pid->deriv     = 0;
+}
+
+void filterReset(PidObject* pid, const float samplingRate, const float cutoffFreq, bool enableDFilter) {
+  pid->enableDFilter = enableDFilter;
+  if (pid->enableDFilter)
+  {
+    lpf2pInit(&pid->dFilter, samplingRate, cutoffFreq);
+  }
 }
 
 void pidSetError(PidObject* pid, const float error)
