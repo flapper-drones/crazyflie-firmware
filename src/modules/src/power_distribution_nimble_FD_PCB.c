@@ -59,7 +59,6 @@ static struct {
   int8_t rollBias;
 } flapperConfig;
 
-// static uint16_t act_max = 32767;
 static uint16_t act_max = 65535;
 
 #ifdef ENABLE_PWM_EXTENDED
@@ -76,20 +75,6 @@ static uint16_t act_max = 65535;
 void powerDistributionInit(void)
 
 {
-  
-  #ifndef MOTOR_M1_NEUTRAL
-    #define MOTOR_M1_NEUTRAL 0
-  #endif
-  #ifndef MOTOR_M2_NEUTRAL
-    #define MOTOR_M2_NEUTRAL 0
-  #endif
-  #ifndef MOTOR_M3_NEUTRAL
-    #define MOTOR_M3_NEUTRAL 0
-  #endif
-  #ifndef MOTOR_M4_NEUTRAL
-    #define MOTOR_M4_NEUTRAL 0
-  #endif
-
   motorsInit(platformConfigGetMotorMapping());
   DEBUG_PRINT("Using Flapper Drone power distribution\n");
   
@@ -97,57 +82,6 @@ void powerDistributionInit(void)
   flapperConfig.pitchServoNeutral = configblockGetServoNeutralPitch();
   flapperConfig.yawServoNeutral = configblockGetServoNeutralYaw();
   flapperConfig.rollBias = configblockGetMotorBiasRoll();
-  
-  // // "Demo" Insect Flapper #02
-  // servoTrims.roll = 0.0;
-  // servoTrims.pitch = -0.05;
-  // servoTrims.yaw = 0.125;
-
-  // // "Remco" Flapper #05
-  // servoTrims.roll = 0.0;
-  // servoTrims.pitch = -0.05;
-  // servoTrims.yaw = 0.1;
-
-  // // values used for MAVLab order: #10, #14, #18
-  // servoTrims.roll = 0.0;
-  // servoTrims.pitch = 0.0;
-  // servoTrims.yaw = 0.05;
-
-  // // values used for MAVLab order: #09
-  // servoTrims.roll = 0.0;
-  // servoTrims.pitch = -0.15;
-  // servoTrims.yaw = 0.0;
-
-  // // values used for MAVLab order: #11
-  // servoTrims.roll = 0.0;
-  // servoTrims.pitch = 0.2;
-  // servoTrims.yaw = 0.05;
-
-  // // values used for MAVLab order: #12
-  // servoTrims.roll = 0.0;
-  // servoTrims.pitch = -0.2;
-  // servoTrims.yaw = 0.1;
-
-  // // values used for MAVLab order: #15
-  // servoTrims.roll = 0.0;
-  // servoTrims.pitch = 0.1;
-  // servoTrims.yaw = 0.15;
-
-  // // values used for MAVLab order: #16
-  // servoTrims.roll = 0.0;
-  // servoTrims.pitch = 0.08;
-  // servoTrims.yaw = 0.0;
-
-// // values used for MAVLab order: #17
-//   servoTrims.roll = 0.0;
-//   servoTrims.pitch = -0.07;
-//   servoTrims.yaw = 0.15;
-
-  // // values used for MAVLab order: #19
-  // servoTrims.roll = 0.0;
-  // servoTrims.pitch = -0.22;
-  // servoTrims.yaw = 0.1;
-
 }
 
 bool powerDistributionTest(void)
@@ -163,10 +97,10 @@ bool powerDistributionTest(void)
 
 void powerStop()
 {
-  motorsSetRatio(MOTOR_M1, MOTOR_M1_NEUTRAL);
+  motorsSetRatio(MOTOR_M1, 0);
   motorsSetRatio(MOTOR_M2, limitThrust(flapperConfig.pitchServoNeutral*act_max/100.0f));
   motorsSetRatio(MOTOR_M3, limitThrust(flapperConfig.yawServoNeutral*act_max/100.0f));
-  motorsSetRatio(MOTOR_M4, MOTOR_M4_NEUTRAL);
+  motorsSetRatio(MOTOR_M4, 0);
 }
 
 void powerDistribution(const control_t *control)
@@ -201,7 +135,6 @@ PARAM_ADD(PARAM_UINT16, m4, &motorPowerSet.m4)
 PARAM_GROUP_STOP(motorPowerSet)
 
 PARAM_GROUP_START(_flapper)
-// PARAM_ADD(PARAM_UINT8, enable, &motorSetEnable)
 PARAM_ADD(PARAM_INT8, motBiasRoll, &flapperConfig.rollBias)
 PARAM_ADD(PARAM_UINT8, servPitchNeutr, &flapperConfig.pitchServoNeutral)
 PARAM_ADD(PARAM_UINT8, servYawNeutr, &flapperConfig.yawServoNeutral)

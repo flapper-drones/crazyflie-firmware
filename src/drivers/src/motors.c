@@ -42,12 +42,16 @@
 //Logging includes
 #include "log.h"
 
+//Configblock with servo motor trims
+#include "configblock.h"
+
 static uint16_t motorsBLConvBitsTo16(uint16_t bits);
 static uint16_t motorsBLConv16ToBits(uint16_t bits);
 static uint16_t motorsConvBitsTo16(uint16_t bits);
 static uint16_t motorsConv16ToBits(uint16_t bits);
 
 uint32_t motor_ratios[] = {0, 0, 0, 0};
+uint32_t motor_ratios_init[] = {0, 0, 0, 0};
 
 void motorsPlayTone(uint16_t frequency, uint16_t duration_msec);
 void motorsPlayMelody(uint16_t *notes);
@@ -60,19 +64,6 @@ const MotorPerifDef** motorMap;  /* Current map configuration */
 const uint32_t MOTORS[] = { MOTOR_M1, MOTOR_M2, MOTOR_M3, MOTOR_M4 };
 
 const uint16_t testsound[NBR_OF_MOTORS] = {A4, A5, F5, D5 };
-
-#ifndef MOTOR_M1_NEUTRAL
-  #define MOTOR_M1_NEUTRAL 0
-#endif
-#ifndef MOTOR_M2_NEUTRAL
-  #define MOTOR_M2_NEUTRAL 0
-#endif
-#ifndef MOTOR_M3_NEUTRAL
-  #define MOTOR_M3_NEUTRAL 0
-#endif
-#ifndef MOTOR_M4_NEUTRAL
-  #define MOTOR_M4_NEUTRAL 0
-#endif
 
 static bool isInit = false;
 
@@ -238,11 +229,16 @@ void motorsInit(const MotorPerifDef** motorMapSelect)
 
   isInit = true;
 
+  #ifdef MOTOR_SETUP_NIMBLE
+    motor_ratios_init[1]=(uint32_t)configblockGetServoNeutralPitch()*65535/100.0f;
+    motor_ratios_init[2]=(uint32_t)configblockGetServoNeutralYaw()*65535/100.0f;
+  #endif
+
   // Output zero power
-  motorsSetRatio(MOTOR_M1, MOTOR_M1_NEUTRAL);
-  motorsSetRatio(MOTOR_M2, MOTOR_M2_NEUTRAL);
-  motorsSetRatio(MOTOR_M3, MOTOR_M3_NEUTRAL);
-  motorsSetRatio(MOTOR_M4, MOTOR_M4_NEUTRAL);
+  motorsSetRatio(MOTOR_M1, motor_ratios_init[0]);
+  motorsSetRatio(MOTOR_M2, motor_ratios_init[1]);
+  motorsSetRatio(MOTOR_M3, motor_ratios_init[2]);
+  motorsSetRatio(MOTOR_M4, motor_ratios_init[3]);
 }
 
 void motorsDeInit(const MotorPerifDef** motorMapSelect)
