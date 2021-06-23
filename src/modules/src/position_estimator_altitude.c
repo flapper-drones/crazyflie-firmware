@@ -117,6 +117,10 @@ static void positionUpdateVelocityInternal(float accWZ, float dt, struct selfSta
   state->velocityZ *= state->velZAlpha;
 }
 
+float getAltitude() {
+  return state.estimatedZ;
+}
+
 LOG_GROUP_START(posEstAlt)
 LOG_ADD(LOG_FLOAT, estimatedZ, &state.estimatedZ)
 LOG_ADD(LOG_FLOAT, estVZ, &state.estimatedVZ)

@@ -29,3 +29,4 @@
 
 void positionEstimate(state_t* estimate, const baro_t* baro, const tofMeasurement_t* tofMeasurement, float dt, uint32_t tick);
 void positionUpdateVelocity(float accWZ, float dt);
+float getAltitude();
