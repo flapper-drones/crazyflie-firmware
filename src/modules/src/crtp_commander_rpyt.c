@@ -264,7 +264,7 @@ void crtpCommanderRpytDecodeSetpoint(setpoint_t *setpoint, CRTPPacket *pk)
  *
  * These parameters have impact on which level and mode to use.
  */
-PARAM_GROUP_START(flightmode)
+PARAM_GROUP_START(modes)
 
 /**
  * @brief Keeps the quad at its current altitude automatically
@@ -306,6 +306,6 @@ PARAM_ADD_CORE(PARAM_UINT8, stabModePitch, &stabilizationModePitch)
  */
 PARAM_ADD_CORE(PARAM_UINT8, stabModeYaw, &stabilizationModeYaw)
 
-PARAM_ADD(PARAM_UINT8, takoff, &enableTakoff)
+PARAM_ADD(PARAM_UINT8, takeoff, &enableTakoff)
 
-PARAM_GROUP_STOP(flightmode)
+PARAM_GROUP_STOP(modes)

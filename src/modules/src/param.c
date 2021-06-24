@@ -165,17 +165,17 @@ bool paramTest(void)
 
 void paramTask(void * prm)
 {
-	crtpInitTaskQueue(CRTP_PORT_PARAM);
+  crtpInitTaskQueue(CRTP_PORT_PARAM);
 
-	while(1) {
-		crtpReceivePacketBlock(CRTP_PORT_PARAM, &p);
+  while(1) {
+	crtpReceivePacketBlock(CRTP_PORT_PARAM, &p);
 
-		if (p.channel==TOC_CH)
-		  paramTOCProcess(p.data[0]);
-	  else if (p.channel==READ_CH)
-		  paramReadProcess();
-		else if (p.channel==WRITE_CH)
-		  paramWriteProcess();
+	if (p.channel==TOC_CH)
+	  paramTOCProcess(p.data[0]);
+	else if (p.channel==READ_CH)
+	  paramReadProcess();
+	else if (p.channel==WRITE_CH)
+	  paramWriteProcess();
     else if (p.channel==MISC_CH) {
       if (p.data[0] == MISC_SETBYNAME) {
         int i, nzero = 0;
@@ -205,7 +205,7 @@ void paramTask(void * prm)
         crtpSendPacketBlock(&p);
       }
     }
-	}
+  }
 }
 
 void paramTOCProcess(int command)
