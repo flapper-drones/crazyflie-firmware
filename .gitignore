@@ -35,3 +35,4 @@ docs/api
 *.opendb
 *.db-shm
 *.db-wal
+*.sqlite-journal
