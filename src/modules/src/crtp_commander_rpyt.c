@@ -186,14 +186,8 @@ void crtpCommanderRpytDecodeSetpoint(setpoint_t *setpoint, CRTPPacket *pk)
       setpoint->velocity.z -= TakeoffLandSpeed;
       if (setpoint->velocity.z > 0.8f * -TakeoffLandSpeed || setpoint->velocity.z < 1.2f * -TakeoffLandSpeed) enableLanding = false;
       if (getAltitude() - takeoffGround <= 0.10f) {
-        thresholdCounter++;
-        if (thresholdCounter >= 10)
-          altHoldMode = false;
-      }
-      else {
-        thresholdCounter--;
-      }
-      
+        altHoldMode = false;
+      }     
     }
   }
   else {
