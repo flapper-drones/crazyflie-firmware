@@ -89,7 +89,7 @@ static bool enableTakoff = false;
 static int thresholdCounter = 0;
 static int takeoffCounter = 0;
 static float takeoffGround = 0.0f;
-static float TakeoffLandSpeed = 0.5f;
+const float TakeoffLandSpeed = 0.5f;
 
 
 /**
@@ -151,10 +151,10 @@ void crtpCommanderRpytDecodeSetpoint(setpoint_t *setpoint, CRTPPacket *pk)
 
   if (altHoldMode) {
     if (!modeSet) {             //Reset filter and PID values on first initiation of assist mode to prevent sudden reactions.
+      takeoffGround = getAltitude();
       modeSet = true;
       positionControllerResetAllPID();
       positionControllerResetAllfilters();
-      takeoffGround = getAltitude();
       if (enableTakoff)
         takeoff = true;
     }
@@ -184,10 +184,12 @@ void crtpCommanderRpytDecodeSetpoint(setpoint_t *setpoint, CRTPPacket *pk)
     }
     else if (enableLanding) {
       setpoint->velocity.z -= TakeoffLandSpeed;
-      if (setpoint->velocity.z > 0.8f * -TakeoffLandSpeed || setpoint->velocity.z < 1.2f * -TakeoffLandSpeed) enableLanding = false;
-      if (getAltitude() - takeoffGround <= 0.10f) {
+      if (getAltitude() - takeoffGround <= 0.35f) {
         altHoldMode = false;
-      }     
+        enableLanding = false;
+      }
+      if (setpoint->velocity.z > 0.8f * (TakeoffLandSpeed * -1) || setpoint->velocity.z < 1.2f * (TakeoffLandSpeed * -1))
+        enableLanding = false;    
     }
   }
   else {
