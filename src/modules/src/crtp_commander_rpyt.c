@@ -85,7 +85,7 @@ static bool posSetMode = false;
 static bool modeSet = false;
 static bool takeoff = false;
 static bool enableLanding = false;
-static bool enableTakoff = false;
+static bool enableTakeoff = false;
 static int thresholdCounter = 0;
 static int takeoffCounter = 0;
 static float takeoffGround = 0.0f;
@@ -155,7 +155,7 @@ void crtpCommanderRpytDecodeSetpoint(setpoint_t *setpoint, CRTPPacket *pk)
       modeSet = true;
       positionControllerResetAllPID();
       positionControllerResetAllfilters();
-      if (enableTakoff)
+      if (enableTakeoff)
         takeoff = true;
     }
     setpoint->thrust = 0;
@@ -180,6 +180,7 @@ void crtpCommanderRpytDecodeSetpoint(setpoint_t *setpoint, CRTPPacket *pk)
         takeoff = false;
         takeoffCounter = 0;
         thresholdCounter = 0;
+        enableTakeoff = false;
       }
     }
     else if (enableLanding) {
@@ -317,7 +318,8 @@ PARAM_ADD_CORE(PARAM_UINT8, stabModePitch, &stabilizationModePitch)
  */
 PARAM_ADD_CORE(PARAM_UINT8, stabModeYaw, &stabilizationModeYaw)
 
-PARAM_ADD(PARAM_UINT8, takeoff, &enableTakoff)
+PARAM_ADD(PARAM_UINT8, takeoff, &enableTakeoff)
+
 PARAM_ADD(PARAM_UINT8, landing, &enableLanding)
 
 PARAM_GROUP_STOP(modes)
