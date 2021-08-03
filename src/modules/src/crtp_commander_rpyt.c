@@ -37,6 +37,7 @@
 #include "position_controller.h"
 #include "position_estimator.h"
 
+#include "debug.h"
 
 #define MIN_THRUST  1000
 #define MAX_THRUST  60000
@@ -83,6 +84,7 @@ static bool posHoldMode = false;
 static bool posSetMode = false;
 
 static bool modeSet = false;
+static bool landing = false;
 static bool takeoff = false;
 static bool enableLanding = false;
 static bool enableTakeoff = false;
@@ -155,47 +157,67 @@ void crtpCommanderRpytDecodeSetpoint(setpoint_t *setpoint, CRTPPacket *pk)
       modeSet = true;
       positionControllerResetAllPID();
       positionControllerResetAllfilters();
-      if (enableTakeoff)
-        takeoff = true;
     }
     setpoint->thrust = 0;
     setpoint->mode.z = modeVelocity;
 
-    setpoint->velocity.z = ((float)rawThrust - 32767.f) / 32767.f;
-    if (takeoff) {
-      takeoffCounter++;
-      if (takeoffCounter >= 10) {
-        setpoint->velocity.z += TakeoffLandSpeed;
+    if (enableTakeoff) {
+      if (!takeoff) {
+        takeoff = true;
+        DEBUG_PRINT("Taking-off\n");
       }
-      if (getAltitude() - takeoffGround >= 0.5f)
-        thresholdCounter++;
-      else
-        thresholdCounter--;
-      if (thresholdCounter < 0)
-        thresholdCounter = 0;
-      if (thresholdCounter > 5)
-      {
-        positionControllerResetAllPID();
-        positionControllerResetAllfilters();
+
+      takeoffCounter++;
+      
+      if (takeoffCounter >= 10) {
+        setpoint->velocity.z = TakeoffLandSpeed;
+      }
+      else {
+        setpoint->velocity.z = 0.0f;
+      }
+      
+      // if (getAltitude() - takeoffGround >= 0.75f) thresholdCounter++;
+      // else thresholdCounter--;
+      
+      // if (thresholdCounter < 0) thresholdCounter = 0;
+      // if (thresholdCounter > 5)
+      if (getAltitude() - takeoffGround >= 0.75f) {
+        //positionControllerResetAllPID();
+        //positionControllerResetAllfilters();
         takeoff = false;
         takeoffCounter = 0;
         thresholdCounter = 0;
+        setpoint->velocity.z = 0.0f;
         enableTakeoff = false;
+        DEBUG_PRINT("Hover assist active\n");
       }
     }
     else if (enableLanding) {
-      setpoint->velocity.z -= TakeoffLandSpeed;
+      if (!landing) {
+        DEBUG_PRINT("Landing\n");
+        landing = true;
+      }
+      setpoint->velocity.z = -TakeoffLandSpeed;
+      // TODO: try to detect landing using e.g. accelerometer, or when altitude drops suddenly (baro experiencing the ground effect), or when altitude becomes constant
       if (getAltitude() - takeoffGround <= 0.35f) {
         altHoldMode = false;
         enableLanding = false;
+        landing = false;
+        modeSet = false;
       }
-      if (setpoint->velocity.z > 0.8f * (TakeoffLandSpeed * -1) || setpoint->velocity.z < 1.2f * (TakeoffLandSpeed * -1))
-        enableLanding = false;    
+      // if (setpoint->velocity.z > 0.8f * (TakeoffLandSpeed * -1) || setpoint->velocity.z < 1.2f * (TakeoffLandSpeed * -1))
+      //   enableLanding = false;    
     }
-  }
+    else {
+      setpoint->velocity.z = ((float)rawThrust - 32767.f) / 32767.f;
+    }
+  } 
+  
   else {
     setpoint->mode.z = modeDisable;
     modeSet = false;
+    landing = false;
+    takeoff = false;
   }
 
   // roll/pitch
