@@ -214,36 +214,43 @@ void cppmClearQueue(void)
 
 float cppmConvert2Float(uint16_t timestamp, float min, float max, float deadband)
 {
-  if (timestamp < CPPM_MIN_PPM_USEC)
-  {
-    timestamp = CPPM_MIN_PPM_USEC;
-  }
-  if (timestamp > CPPM_MAX_PPM_USEC)
-  {
-    timestamp = CPPM_MAX_PPM_USEC;
-  }
-
-  float scale_raw = (float)(timestamp - CPPM_MIN_PPM_USEC) / (float)(CPPM_MAX_PPM_USEC - CPPM_MIN_PPM_USEC);
   float scale;
-  if (deadband == 0)
+  
+  if (timestamp == 0) // timestamp is zero before we get the first valid timestamp --> set scale to neutral (0.5)
   {
-    scale = scale_raw;
+    scale = 0.5f;
   }
   else
   {
-    if (scale_raw < (0.5f - deadband/2) )
+    if (timestamp < CPPM_MIN_PPM_USEC)
     {
-      scale = scale_raw / (1.f - deadband);
+      timestamp = CPPM_MIN_PPM_USEC;
     }
-    else if (scale_raw > (0.5f + deadband/2) )
+    if (timestamp > CPPM_MAX_PPM_USEC)
     {
-      scale = (scale_raw - deadband) / (1.f - deadband);
+      timestamp = CPPM_MAX_PPM_USEC;
+    }
+
+    float scale_raw = (float)(timestamp - CPPM_MIN_PPM_USEC) / (float)(CPPM_MAX_PPM_USEC - CPPM_MIN_PPM_USEC);
+    if (deadband == 0)
+    {
+      scale = scale_raw;
     }
     else
     {
-      scale = 0.5f;
+      if (scale_raw < (0.5f - deadband/2) )
+      {
+        scale = scale_raw / (1.f - deadband);
+      }
+      else if (scale_raw > (0.5f + deadband/2) )
+      {
+        scale = (scale_raw - deadband) / (1.f - deadband);
+      }
+      else
+      {
+        scale = 0.5f;
+      }
     }
-    
   }
   
   return min + ((max - min) * scale);

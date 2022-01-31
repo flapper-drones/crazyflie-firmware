@@ -12,7 +12,6 @@
 #include "math3d.h"
 
 #define ATTITUDE_UPDATE_DT    (float)(1.0f/ATTITUDE_RATE)
-#define YAW_MAX_DELTA    45.0f
 
 static bool tiltCompensationEnabled = false;
 
@@ -28,8 +27,6 @@ static float r_roll;
 static float r_pitch;
 static float r_yaw;
 static float accelz;
-
-bool flying = 0;
 
 void controllerPidInit(void)
 {
@@ -69,9 +66,9 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
     // Rate-controled YAW is moving YAW angle setpoint
     if (setpoint->mode.yaw == modeVelocity) {
       attitudeDesired.yaw = capAngle(attitudeDesired.yaw + setpoint->attitudeRate.yaw * ATTITUDE_UPDATE_DT);
-      float delta = capAngle(attitudeDesired.yaw-state->attitude.yaw);
        
       #ifdef YAW_MAX_DELTA
+      float delta = capAngle(attitudeDesired.yaw-state->attitude.yaw);
       // keep the yaw setpoint within +/- YAW_MAX_DELTA from the current yaw
         if (delta > YAW_MAX_DELTA)
         {
@@ -160,23 +157,12 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
     cmd_pitch = control->pitch;
     cmd_yaw = control->yaw;
 
-    if (flying == 1) 
-    { 
-      positionControllerInit();
-      flying = 0;
-    }
-    
     attitudeControllerResetAllPID();
     positionControllerResetAllPID();
 
     // Reset the calculated YAW angle for rate control
     attitudeDesired.yaw = state->attitude.yaw;
   }
-  else
-  {
-    flying = 1;
-  }
-  
 }
 
 /**

@@ -20,7 +20,6 @@ PYTHON            ?= python3
 DFU_UTIL          ?= dfu-util
 CLOAD             ?= 1
 DEBUG             ?= 0
-CLOAD_SCRIPT      ?= python3 -m cfloader
 CLOAD_CMDS        ?=
 CLOAD_ARGS        ?=
 PLATFORM          ?= cf2
@@ -28,6 +27,12 @@ LPS_TDMA_ENABLE   ?= 0
 LPS_TDOA_ENABLE   ?= 0
 LPS_TDOA3_ENABLE  ?= 0
 
+# Cload is handled in a special way on windows in WSL to use the Windows python interpreter
+ifdef WSL_DISTRO_NAME
+CLOAD_SCRIPT      ?= python.exe -m cfloader
+else
+CLOAD_SCRIPT      ?= python3 -m cfloader
+endif
 
 # Platform configuration handling
 -include current_platform.mk
@@ -100,7 +105,7 @@ VPATH +=  $(FREERTOS)/portable/MemMang
 MEMMANG_OBJ ?= heap_4.o
 
 VPATH += $(FREERTOS)
-FREERTOS_OBJ = list.o tasks.o queue.o timers.o $(MEMMANG_OBJ)
+FREERTOS_OBJ = list.o tasks.o queue.o timers.o event_groups.o $(MEMMANG_OBJ)
 
 #FatFS
 VPATH += $(LIB)/FatFS
@@ -121,7 +126,7 @@ CFLAGS += -DAPP_PRIORITY=$(APP_PRIORITY)
 endif
 
 # Crazyflie sources
-VPATH += $(CRAZYFLIE_BASE)/src/init $(CRAZYFLIE_BASE)/src/hal/src $(CRAZYFLIE_BASE)/src/modules/src $(CRAZYFLIE_BASE)/src/modules/src/lighthouse $(CRAZYFLIE_BASE)/src/modules/src/kalman_core $(CRAZYFLIE_BASE)/src/utils/src $(CRAZYFLIE_BASE)/src/drivers/bosch/src $(CRAZYFLIE_BASE)/src/drivers/src $(CRAZYFLIE_BASE)/src/platform
+VPATH += $(CRAZYFLIE_BASE)/src/init $(CRAZYFLIE_BASE)/src/hal/src $(CRAZYFLIE_BASE)/src/modules/src $(CRAZYFLIE_BASE)/src/modules/src/lighthouse $(CRAZYFLIE_BASE)/src/modules/src/kalman_core $(CRAZYFLIE_BASE)/src/utils/src $(CRAZYFLIE_BASE)/src/drivers/bosch/src $(CRAZYFLIE_BASE)/src/drivers/src $(CRAZYFLIE_BASE)/src/platform $(CRAZYFLIE_BASE)/src/drivers/esp32/src
 VPATH += $(CRAZYFLIE_BASE)/src/utils/src/kve
 
 ############### Source files configuration ################
@@ -140,6 +145,7 @@ PROJ_OBJ += bmi055_accel.o bmi055_gyro.o bmi160.o bmp280.o bstdr_comm_support.o 
 PROJ_OBJ += bmi088_accel.o bmi088_gyro.o bmi088_fifo.o bmp3.o
 PROJ_OBJ += pca9685.o vl53l0x.o pca95x4.o pca9555.o vl53l1x.o pmw3901.o
 PROJ_OBJ += amg8833.o lh_bootloader.o
+PROJ_OBJ += esp_rom_bootloader.o esp_slip.o
 
 # USB Files
 PROJ_OBJ += usb_bsp.o usblink.o usbd_desc.o usb.o
@@ -159,7 +165,7 @@ PROJ_OBJ += vl53l1_api_calibration.o vl53l1_api_debug.o vl53l1_api_preset_modes.
 PROJ_OBJ += vl53l1_register_funcs.o vl53l1_wait.o vl53l1_core_support.o
 
 # Modules
-PROJ_OBJ += system.o comm.o console.o pid.o crtpservice.o param.o
+PROJ_OBJ += system.o comm.o console.o pid.o crtpservice.o param_task.o param_logic.o
 PROJ_OBJ += log.o worker.o queuemonitor.o msp.o
 PROJ_OBJ += platformservice.o sound_cf2.o extrx.o sysload.o mem.o
 PROJ_OBJ += range.o app_handler.o static_mem.o app_channel.o
@@ -260,6 +266,7 @@ PROJ_OBJ += configblockeeprom.o
 PROJ_OBJ += sleepus.o statsCnt.o rateSupervisor.o
 PROJ_OBJ += lighthouse_core.o pulse_processor.o pulse_processor_v1.o pulse_processor_v2.o lighthouse_geometry.o ootx_decoder.o lighthouse_calibration.o lighthouse_deck_flasher.o lighthouse_position_est.o lighthouse_storage.o lighthouse_transmit.o
 PROJ_OBJ += kve_storage.o kve.o
+PROJ_OBJ += esp_deck_flasher.o
 
 ifeq ($(DEBUG_PRINT_ON_SEGGER_RTT), 1)
 VPATH += $(LIB)/Segger_RTT/RTT
@@ -289,7 +296,7 @@ INCLUDES += -I$(CRAZYFLIE_BASE)/src/config
 INCLUDES += -I$(CRAZYFLIE_BASE)/src/platform
 
 INCLUDES += -I$(CRAZYFLIE_BASE)/src/deck/interface -I$(CRAZYFLIE_BASE)/src/deck/drivers/interface
-INCLUDES += -I$(CRAZYFLIE_BASE)/src/drivers/interface -I$(CRAZYFLIE_BASE)/src/drivers/bosch/interface
+INCLUDES += -I$(CRAZYFLIE_BASE)/src/drivers/interface -I$(CRAZYFLIE_BASE)/src/drivers/bosch/interface -I$(CRAZYFLIE_BASE)/src/drivers/esp32/interface
 INCLUDES += -I$(CRAZYFLIE_BASE)/src/hal/interface
 INCLUDES += -I$(CRAZYFLIE_BASE)/src/modules/interface -I$(CRAZYFLIE_BASE)/src/modules/interface/kalman_core -I$(CRAZYFLIE_BASE)/src/modules/interface/lighthouse
 INCLUDES += -I$(CRAZYFLIE_BASE)/src/utils/interface -I$(CRAZYFLIE_BASE)/src/utils/interface/kve -I$(CRAZYFLIE_BASE)/src/utils/interface/lighthouse -I$(CRAZYFLIE_BASE)/src/utils/interface/tdoa
@@ -316,6 +323,12 @@ endif
 
 # Disable warnings for unaligned addresses in packed structs (added in GCC 9)
 CFLAGS += -Wno-address-of-packed-member
+
+# Disable warnings for incorrectly detected region size (added in GCC 11)
+# The compiler is not detecting properly GPIO structure size
+CFLAGS += -Wno-array-bounds
+CFLAGS += -Wno-stringop-overread
+CFLAGS += -Wno-stringop-overflow
 
 ifeq ($(LTO), 1)
   CFLAGS += -flto
@@ -488,4 +501,18 @@ unit:
 # The flag "-DUNITY_INCLUDE_DOUBLE" allows comparison of double values in Unity. See: https://stackoverflow.com/a/37790196
 	rake unit "DEFINES=$(CFLAGS) -DUNITY_INCLUDE_DOUBLE" "FILES=$(FILES)" "UNIT_TEST_STYLE=$(UNIT_TEST_STYLE)"
 
-.PHONY: all clean build compile unit prep erase flash check_submodules trace openocd gdb halt reset flash_dfu flash_verify cload size print_version clean_version
+# Python bindings
+MOD_INC = $(CRAZYFLIE_BASE)/src/modules/interface
+MOD_SRC = $(CRAZYFLIE_BASE)/src/modules/src
+
+bindings_python: bindings/setup.py bin/cffirmware_wrap.c $(MOD_SRC)/*.c
+	$(PYTHON) bindings/setup.py build_ext --inplace
+
+bin/cffirmware_wrap.c cffirmware.py: bindings/cffirmware.i $(MOD_INC)/*.h
+	swig -python -I$(MOD_INC) -o bin/cffirmware_wrap.c bindings/cffirmware.i
+	mv bin/cffirmware.py cffirmware.py
+
+test_python: bindings_python
+	$(PYTHON) -m pytest test_python
+
+.PHONY: all clean build compile unit prep erase flash check_submodules trace openocd gdb halt reset flash_dfu flash_verify cload size print_version clean_version bindings_python

@@ -5,7 +5,6 @@
 - title: Userguides
   subs:
     - {page_id: deck}
-    - {page_id: decks-index}
     - {page_id: logparam}
     - {page_id: eventtrigger}
     - {page_id: app_layer}
@@ -20,6 +19,7 @@
     - {page_id: lh_overview}
     - {page_id: loco_positioning}
     - {page_id: persistent_storage}
+    - {page_id: pwm-to-thrust}
 - title: Development Instructions
   subs:
     - {page_id: starting_development}

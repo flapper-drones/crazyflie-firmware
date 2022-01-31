@@ -1030,6 +1030,11 @@ void ledring12Worker(void * data)
   }
   current_effect = effect;
 
+  if (current_effect > neffect) {
+    current_effect = 0;
+    DEBUG_PRINT("Bad value for effect (> neffect)\n");
+  }
+
   effectsFct[current_effect](buffer, reset);
   overrideWithLightSignal(buffer);
   ws2812Send(buffer, NBR_LEDS);
@@ -1131,23 +1136,29 @@ PARAM_GROUP_START(ring)
 /**
  * @brief Id of effect to use (default: 6)
  *
- * | Id | Effect              | \n
- * | -  | -                   | \n
- * | 0  | Off                 | \n
- * | 1  | White spinner       | \n
- * | 2  | Color spinner       | \n
- * | 3  | Tilt                | \n
- * | 4  | Brightness          | \n
- * | 5  | Color spinner 2     | \n
- * | 6  | Double spinner      | \n
- * | 7  | Solid color effect  | \n
- * | 8  | Factory test        | \n
- * | 9  | Battery status      | \n
- * | 10 | Boat lights         | \n
- * | 11 | Alert               | \n
- * | 12 | Gravity             | \n
+ * | Id | Effect                        | \n
+ * | -  | -                             | \n
+ * | 0  | Off                           | \n
+ * | 1  | White spinner                 | \n
+ * | 2  | Color spinner                 | \n
+ * | 3  | Tilt                          | \n
+ * | 4  | Brightness                    | \n
+ * | 5  | Color spinner 2               | \n
+ * | 6  | Double spinner                | \n
+ * | 7  | Solid color effect            | \n
+ * | 8  | Factory test                  | \n
+ * | 9  | Battery status                | \n
+ * | 10 | Boat lights                   | \n
+ * | 11 | Alert                         | \n
+ * | 12 | Gravity                       | \n
+ * | 13 | Virtual Memory                | \n
+ * | 14 | Fade color                    | \n
+ * | 15 | Communication Signal Strength | \n
+ * | 16 | Status Localization Service   | \n
+ * | 17 | LED timing from memory        | \n
+ * | 18 | Lighthouse  Positioning       | \n
  */
-PARAM_ADD_CORE(PARAM_UINT8, effect, &effect)
+PARAM_ADD_CORE(PARAM_UINT8 | PARAM_PERSISTENT, effect, &effect)
 
 /**
  * @brief Number of effects available

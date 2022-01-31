@@ -85,11 +85,13 @@
 
 #define EXTRX_SWITCH_MIN_CNT 5 // number of identical subsequent switch states before the switch variable is changed
 
+bool extRxArm = false;
+bool extRxAltHold = false;
+  
 #ifndef EXTRX_ARMING
   #define EXTRX_ARMING    false
 #endif
 #if EXTRX_ARMING
-  bool extRxArm = false;
   bool extRxArmPrev = false;
   int8_t arm_cnt = 0;
 #endif
@@ -98,14 +100,14 @@
   #define EXTRX_ALT_HOLD    false
 #endif
 #if EXTRX_ALT_HOLD
+  #define EXTRX_DEADBAND_ZVEL  (0.25f)
   bool extRxAltHoldPrev = false;
-  bool extRxAltHold = false;
   int8_t altHold_cnt = 0;
 #endif
 
 
 static setpoint_t extrxSetpoint;
-static uint16_t ch[EXTRX_NR_CHANNELS];
+static uint16_t ch[EXTRX_NR_CHANNELS] = {0};
 
 static void extRxTask(void *param);
 static void extRxDecodeCppm(void);
@@ -149,11 +151,6 @@ static void extRxTask(void *param)
   {
     extRxDecodeCppm();
   }
-}
-
-float extRxGetNormalizedChannelValue(uint8_t channel)
-{
-  return cppmConvert2Float(ch[channel], -1, 1, 0.0);
 }
 
 static void extRxDecodeChannels(void)
@@ -207,7 +204,7 @@ static void extRxDecodeChannels(void)
     extrxSetpoint.thrust = 0;
     extrxSetpoint.mode.z = modeVelocity;
 
-    extrxSetpoint.velocity.z = cppmConvert2Float(ch[EXTRX_CH_THRUST], -1, 1, 0.25);
+    extrxSetpoint.velocity.z = cppmConvert2Float(ch[EXTRX_CH_THRUST], -1, 1, EXTRX_DEADBAND_ZVEL);
   } 
   else 
   {
@@ -335,37 +332,38 @@ LOG_ADD(LOG_UINT16, ch7, &ch[7])
 LOG_GROUP_STOP(extrx_raw)
 
 /**
- * External receiver (RX) log group. This contains RPTY data and switch 
- * data after it has been converted.
+ * External receiver (RX) log group. This contains setpoints for 
+ * thrust, roll, pitch, yaw rate, z velocity, and arming and 
+ * altitude-hold signals
  */
 LOG_GROUP_START(extrx)
 /**
- * @brief External RX channel converted to thrust
+ * @brief External RX thrust
  */
-LOG_ADD(LOG_UINT16, thrust, &extrxSetpoint.thrust)
+LOG_ADD(LOG_FLOAT, thrust, &extrxSetpoint.thrust)
 /**
- * @brief External RX channel converted to roll
+ * @brief External RX roll setpoint
  */
 LOG_ADD(LOG_FLOAT, roll, &extrxSetpoint.attitude.roll)
 /**
- * @brief External RX channel converted to pitch
+ * @brief External RX pitch setpoint
  */
 LOG_ADD(LOG_FLOAT, pitch, &extrxSetpoint.attitude.pitch)
 /**
- * @brief External RX channel converted to yaw
+ * @brief External RX yaw rate setpoint
  */
-LOG_ADD(LOG_FLOAT, yaw, &extrxSetpoint.attitude.yaw)
-#if EXTRX_ALT_HOLD
+LOG_ADD(LOG_FLOAT, yawRate, &extrxSetpoint.attitudeRate.yaw)
 /**
- * @brief External RX channel converted to AltHold
+ * @brief External RX z-velocity setpoint
  */
-LOG_ADD(LOG_UINT16, AltHold, &extRxAltHold)
-#endif
-#if EXTRX_ARMING 
+LOG_ADD(LOG_FLOAT, zVel, &extrxSetpoint.velocity.z)
 /**
- * @brief External RX channel converted to Arm
+ * @brief External RX Altitude Hold signal
  */
-LOG_ADD(LOG_UINT16, Arm, &extRxArm)
-#endif
+LOG_ADD(LOG_UINT8, AltHold, &extRxAltHold)
+/**
+ * @brief External RX Arming signal
+ */
+LOG_ADD(LOG_UINT8, Arm, &extRxArm)
 LOG_GROUP_STOP(extrx)
 #endif

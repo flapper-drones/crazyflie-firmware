@@ -11,6 +11,8 @@ bin/*
 cflie.*
 version.c
 tags
+*cffirmware*.so
+cffirmware.py
 
 /cf2.*
 /tag.*
@@ -20,7 +22,14 @@ current_platform.mk
 
 /generated/**
 **/__pycache__/**
+**/*.pyc
 
-/docs/.jekyll-metadata
+bindings/build/*
+bindings/cffirmware_wrap.c
+
+docs/.jekyll-metadata
 docs/.jekyll-cache
-docs/api
+
+docs/api/logs.md_raw
+docs/api/params.md_raw
+docs/api/log_param_doc.json

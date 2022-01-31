@@ -15,6 +15,7 @@ compiler:
     - '-std=c11'
     - '-pedantic'
     - '-O0'
+    - '-g3'
     - '-fsanitize=address'
     - '-fno-omit-frame-pointer'
   includes:
@@ -38,6 +39,8 @@ compiler:
       - 'src/config/'
       - 'src/drivers/interface/'
       - 'src/drivers/src'
+      - 'src/drivers/esp32/interface/'
+      - 'src/drivers/esp32/src/'
       - 'src/hal/interface/'
       - 'src/lib/CMSIS/STM32F4xx/Include'
       - 'src/lib/STM32F4xx_StdPeriph_Driver/inc'
