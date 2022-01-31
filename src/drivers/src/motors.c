@@ -264,8 +264,8 @@ void motorsInit(const MotorPerifDef** motorMapSelect)
   isInit = true;
 
   #ifdef MOTOR_SETUP_NIMBLE
-    motor_ratios_init[1]=(uint32_t)configblockGetServoNeutralPitch()*65535/100.0f;
-    motor_ratios_init[2]=(uint32_t)configblockGetServoNeutralYaw()*65535/100.0f;
+    motor_ratios_init[MOTOR_SERVO_PITCH]=(uint32_t)configblockGetServoNeutralPitch()*65535/100.0f;
+    motor_ratios_init[MOTOR_SERVO_YAW]=(uint32_t)configblockGetServoNeutralYaw()*65535/100.0f;
   #endif
 
   // Output zero power

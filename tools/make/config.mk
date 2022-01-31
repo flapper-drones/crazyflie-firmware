@@ -2,20 +2,29 @@
 #### Config for Flapper Drone Nimble+ ####
 ##########################################
 
-POWER_DISTRIBUTION = nimble_FD_PCB
+## Do not change the settings below, unless if you know what you are doing ##
+#############################################################################
 
 ## Uncomment when using CF2 as flight controller
 # CFLAGS += -DNIMBLE_USE_CF2
 
-## Do not change the settings below, unless if you know waht you are doing ##
-#############################################################################
-
 CFLAGS += -DMOTOR_SETUP_NIMBLE
-CFLAGS += -DENABLE_PWM_EXTENDED
+# CFLAGS += -DENABLE_PWM_EXTENDED
 CFLAGS += -DPID_FILTER_ALL
 CFLAGS += -DCPPM_USE_PA3 # CPPM pin, other alternatives:  PA7 (default), PA2(TX2), PA3(RX2), PB4(IO_3), PB5(IO_2) or PB8(IO_1)
+
+# POWER_DISTRIBUTION = nimble_FD_PCB
+# CFLAGS += -DMOTOR_SERVO_PITCH=1
+# CFLAGS += -DMOTOR_SERVO_YAW=2
+# CFLAGS += -DIMU_PHI=0.0f # IMU orientation
+# CFLAGS += -DIMU_THETA=90.0f
+# CFLAGS += -DIMU_PSI=180.0f
+
+POWER_DISTRIBUTION = nimble_FD_PCB_revD
+CFLAGS += -DMOTOR_SERVO_PITCH=0
+CFLAGS += -DMOTOR_SERVO_YAW=2
 CFLAGS += -DIMU_PHI=0.0f # IMU orientation
-CFLAGS += -DIMU_THETA=90.0f
+CFLAGS += -DIMU_THETA=-90.0f
 CFLAGS += -DIMU_PSI=180.0f
 
 ## Deck selection ##
@@ -29,6 +38,7 @@ CFLAGS += -DIMU_PSI=180.0f
 
 ## To use multiple features at a time, separate their names with colons:
 # CFLAGS += -DDECK_FORCE=bcUSD:bcCPPM:bcLedRing:bcCurrentDeck
+CFLAGS += -DDECK_FORCE=bcUSD:bcLedRing:bcCurrentDeck
 
 ## External receiver settings ##
 ################################
