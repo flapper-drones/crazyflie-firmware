@@ -40,6 +40,14 @@
 /* Number of times in a row we need to see a condition before acting upon it */
 #define SUPERVISOR_HYSTERESIS_THRESHOLD 30
 
+#ifndef MOTOR_SERVO_PITCH
+#define MOTOR_SERVO_PITCH NBR_OF_MOTORS
+#endif
+
+#ifndef MOTOR_SERVO_YAW
+#define MOTOR_SERVO_YAW NBR_OF_MOTORS+1
+#endif
+
 static bool canFly;
 static bool isFlying;
 static bool isTumbled;
@@ -79,7 +87,7 @@ static bool isFlyingCheck()
 {
   int sumRatio = 0;
   for (int i = 0; i < NBR_OF_MOTORS; ++i) {
-    if (i == 0 || i == 3) // TODO: create a list of propulsion motors and check only those
+    if (i != MOTOR_SERVO_PITCH && i != MOTOR_SERVO_YAW) // TODO: create a list of propulsion motors and check only those
     {
       sumRatio += motorsGetRatio(i);
     }
