@@ -35,15 +35,13 @@
 #include "motors.h"
 #include "pm.h"
 #include "debug.h"
+#include "power_distribution.h"
 
 //FreeRTOS includes
 #include "task.h"
 
 //Logging includes
 #include "log.h"
-
-//Configblock with servo motor trims
-#include "configblock.h"
 
 static uint16_t motorsBLConvBitsTo16(uint16_t bits);
 static uint16_t motorsBLConv16ToBits(uint16_t bits);
@@ -260,8 +258,8 @@ void motorsInit(const MotorPerifDef** motorMapSelect)
   isInit = true;
 
   #ifdef MOTOR_SETUP_NIMBLE
-    motor_ratios_init[MOTOR_SERVO_PITCH]=(uint32_t)configblockGetServoNeutralPitch()*65535/100.0f;
-    motor_ratios_init[MOTOR_SERVO_YAW]=(uint32_t)configblockGetServoNeutralYaw()*65535/100.0f;
+    motor_ratios_init[MOTOR_SERVO_PITCH]=(uint32_t) flapperConfigPitchNeutral()*65535/100.0f;
+    motor_ratios_init[MOTOR_SERVO_YAW]=(uint32_t) flapperConfigYawNeutral()*65535/100.0f;
   #endif
 
   // Output zero power

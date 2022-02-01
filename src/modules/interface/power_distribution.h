@@ -33,5 +33,10 @@ bool powerDistributionTest(void);
 void powerDistribution(const control_t *control);
 void powerStop();
 
+#ifdef MOTOR_SETUP_NIMBLE
+int8_t extern flapperConfigRollBias(void);
+uint8_t extern flapperConfigPitchNeutral(void);
+uint8_t extern flapperConfigYawNeutral(void);
+#endif
 
 #endif //__POWER_DISTRIBUTION_H__
