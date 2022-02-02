@@ -41,9 +41,13 @@
 
 // #include "cf_math.h"
 
-static float reading_last = 0;
-static float current_last = 0;
-static float current = 0;
+static float reading_last = 0.0;
+static float current_last = 0.0;
+static float current = 0.0;
+
+static float cursense_gain = 100.0; // voltage amplifier gain
+static float cursense_resistance = 0.004; // current sense resistor resistance in Ohms
+static float cursense_offset = 0.0; // voltage offset
 
 static bool isInit;
 
@@ -79,9 +83,13 @@ void currentDeckTask(void* arg)
     vTaskDelayUntil(&xLastWakeTime, M2T(1));
 
     reading_last = analogReadVoltage(DECK_GPIO_TX2);
-    current_last = 36.7f*reading_last/3.0f-18.3f;
+    // current_last = 36.7f*reading_last/3.0f-18.3f;
 
-    current = 0.975f*current + 0.025f*current_last;
+    current_last = reading_last/(cursense_gain*cursense_resistance) - cursense_offset;
+
+    // simple low pass filter
+    static float alpha = 0.975;
+    current = alpha*current + (1.0f - alpha)*current_last;
   }
 }
 
