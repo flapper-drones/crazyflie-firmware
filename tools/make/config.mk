@@ -10,6 +10,8 @@
 
 CFLAGS += -DMOTOR_SETUP_NIMBLE
 # CFLAGS += -DENABLE_PWM_EXTENDED
+## Keep the yaw setpoint within +/- YAW_MAX_DELTA from the current heading
+CFLAGS += -DYAW_MAX_DELTA=30.0f
 CFLAGS += -DPID_FILTER_ALL
 CFLAGS += -DCPPM_USE_PA3 # CPPM pin, other alternatives:  PA7 (default), PA2(TX2), PA3(RX2), PB4(IO_3), PB5(IO_2) or PB8(IO_1)
 
