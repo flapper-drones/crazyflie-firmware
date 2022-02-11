@@ -34,20 +34,17 @@
 #include "debug.h"
 #include "log.h"
 #include "param.h"
-// #include "range.h"
-// #include "static_mem.h"
-
 #include "currentdeck.h"
-
-// #include "cf_math.h"
+#include "pm.h"
 
 static float reading_last = 0.0;
 static float current_last = 0.0;
 static float current = 0.0;
+static float vbat = 0.0;
+static float power = 0.0;
 
-static float cursense_gain = 100.0; // voltage amplifier gain
-static float cursense_resistance = 0.004; // current sense resistor resistance in Ohms
-static float cursense_offset = 0.0; // voltage offset
+static float ampsPerVolt = 2.5; 
+static float filter_alpha = 0.975;
 
 static bool isInit;
 
@@ -83,13 +80,14 @@ void currentDeckTask(void* arg)
     vTaskDelayUntil(&xLastWakeTime, M2T(1));
 
     reading_last = analogReadVoltage(DECK_GPIO_TX2);
-    // current_last = 36.7f*reading_last/3.0f-18.3f;
-
-    current_last = reading_last/(cursense_gain*cursense_resistance) - cursense_offset;
+    current_last = reading_last*ampsPerVolt;
 
     // simple low pass filter
     static float alpha = 0.975;
-    current = alpha*current + (1.0f - alpha)*current_last;
+    current = alpha*current + (1.0f - filter_alpha)*current_last;
+
+    vbat = pmGetBatteryVoltage();
+    power = vbat * current;
   }
 }
 
@@ -113,7 +111,24 @@ PARAM_ADD_CORE(PARAM_UINT8 | PARAM_RONLY, bcCurrentDeck, &isInit)
 PARAM_GROUP_STOP(deck)
 
 LOG_GROUP_START(current)
-LOG_ADD(LOG_FLOAT, v_raw, &reading_last)
+LOG_ADD(LOG_FLOAT, vbat, &vbat)
 LOG_ADD(LOG_FLOAT, i_raw, &current_last)
 LOG_ADD(LOG_FLOAT, current, &current)
+LOG_ADD(LOG_FLOAT, power, &power)
 LOG_GROUP_STOP(current)
+
+/**
+ *
+ * Current sensor parameters
+ */
+PARAM_GROUP_START(current)
+/**
+ * @brief Current sensor constant (A/V)
+ */
+PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, ampsPerVolt, &ampsPerVolt)
+/**
+ * @brief Current filter parameter <0; 1), set 0 to disable, 0.9999 for max effect 
+ */
+PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, filtAlpha, &filter_alpha)
+
+PARAM_GROUP_STOP(current)
