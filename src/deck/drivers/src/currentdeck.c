@@ -125,10 +125,10 @@ PARAM_GROUP_START(current)
 /**
  * @brief Current sensor constant (A/V)
  */
-PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, ampsPerVolt, &ampsPerVolt)
+PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, ampsPerVolt, &ampsPerVolt)
 /**
  * @brief Current filter parameter <0; 1), set 0 to disable, 0.9999 for max effect 
  */
-PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, filtAlpha, &filter_alpha)
+PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, filtAlpha, &filter_alpha)
 
 PARAM_GROUP_STOP(current)
