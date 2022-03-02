@@ -35,7 +35,6 @@
 #include "motors.h"
 #include "debug.h"
 #include "math.h"
-#include "configblock.h"
 
 static bool motorSetEnable = false;
 
@@ -53,11 +52,17 @@ static struct {
   uint16_t m4;
 } motorPowerSet;
 
-static struct {
+struct flapperConfig_s {
   uint8_t pitchServoNeutral;
   uint8_t yawServoNeutral;
   int8_t rollBias;
-} flapperConfig;
+};
+
+struct flapperConfig_s flapperConfig = {
+  .pitchServoNeutral = 50,
+  .yawServoNeutral = 50,
+  .rollBias = 0,
+};
 
 static float thrust;
 
@@ -78,6 +83,48 @@ static uint16_t act_max = 65535;
   static float pitch_ampl = 0.4f; // 1 = full servo stroke
 #endif
 
+uint8_t limitServoNeutral(uint8_t value)
+{
+  if(value > 75)
+  {
+    value = 75;
+  }
+  else if(value < 25)
+  {
+    value = 25;
+  }
+
+  return (uint8_t)value;
+}
+
+int8_t limitRollBias(uint8_t value)
+{
+  if(value > 25)
+  {
+    value = 25;
+  }
+  else if(value < -25)
+  {
+    value = -25;
+  }
+
+  return (uint8_t)value;
+}
+
+uint8_t flapperConfigPitchNeutral(void)
+{
+  return limitServoNeutral(flapperConfig.pitchServoNeutral);
+}
+
+uint8_t flapperConfigYawNeutral(void)
+{
+  return limitServoNeutral(flapperConfig.pitchServoNeutral);
+}
+
+int8_t flapperConfigRollBias(void)
+{
+  return limitServoNeutral(flapperConfig.rollBias);
+}
 
 void powerDistributionInit(void)
 
@@ -89,11 +136,6 @@ void powerDistributionInit(void)
   motorsInit(platformConfigGetMotorMapping());
   DEBUG_PRINT("Using Flapper Drone power distribution | CF Bolt\n");
   #endif
-  
-  // Reading out servo trims stored in EEPROM
-  flapperConfig.pitchServoNeutral = configblockGetServoNeutralPitch();
-  flapperConfig.yawServoNeutral = configblockGetServoNeutralYaw();
-  flapperConfig.rollBias = configblockGetMotorBiasRoll();
 }
 
 bool powerDistributionTest(void)
@@ -119,6 +161,9 @@ void powerDistribution(const control_t *control)
 {
   thrust = fmin(control->thrust, NIMBLE_MAX_THRUST);
   
+  flapperConfig.pitchServoNeutral=limitServoNeutral(flapperConfig.pitchServoNeutral);
+  flapperConfig.yawServoNeutral=limitServoNeutral(flapperConfig.yawServoNeutral);
+
   motorPower.m2 = limitThrust(flapperConfig.pitchServoNeutral*act_max/100.0f + pitch_ampl*control->pitch); // pitch servo
   motorPower.m3 = limitThrust(flapperConfig.yawServoNeutral*act_max/100.0f - control->yaw); // yaw servo
   motorPower.m1 = motor_zero + 1.0f/pwm_extended_ratio * limitThrust( 0.5f * control->roll + thrust * (1.0f + flapperConfig.rollBias/100.0f) ); // left motor
@@ -148,10 +193,35 @@ PARAM_ADD(PARAM_UINT16, m3, &motorPowerSet.m3)
 PARAM_ADD(PARAM_UINT16, m4, &motorPowerSet.m4)
 PARAM_GROUP_STOP(motorPowerSet)
 
+/**
+ *
+ * Flapper Drone configration parameters
+ */
 PARAM_GROUP_START(_flapper)
-PARAM_ADD(PARAM_INT8, motBiasRoll, &flapperConfig.rollBias)
-PARAM_ADD(PARAM_UINT8, servPitchNeutr, &flapperConfig.pitchServoNeutral)
-PARAM_ADD(PARAM_UINT8, servYawNeutr, &flapperConfig.yawServoNeutral)
+/**
+ * @brief Roll bias <-25%; 25%> (default 0%)
+ *
+ * This parameter can be used if uneven performance of the left and right flapping mechanaisms and/or wings
+ * is observed, which in flight results in a drift in roll/sideways flight. Positive values make the drone roll 
+ * more to the right, negative values to the left.
+ */
+PARAM_ADD(PARAM_INT8 | PARAM_PERSISTENT, motBiasRoll, &flapperConfig.rollBias)
+/**
+ * @brief Pitch servo neutral <25%; 75%> (default 50%)
+ *
+ * The parameter sets the neutral position of the pitch servo, such that the left and right wing-pairs are
+ * aligned when observed from the side. If in flight you observe too much drift forward (nose down) increase the value
+ * and vice versa if the drift is backward (nose up).
+ */
+PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, servPitchNeutr, &flapperConfig.pitchServoNeutral)
+/**
+ * @brief Yaw servo neutral <25%; 75%> (default 50%)
+ *
+ * The parameter sets the neutral position of the yaw servo, such that the yaw control arm is pointed spanwise. If in flight 
+ * you observe drift in the clock-wise direction, increase this parameter and vice-versa if the drift is counter-clock-wise.
+ */
+PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, servYawNeutr, &flapperConfig.yawServoNeutral)
+
 PARAM_GROUP_STOP(_flapper)
 
 LOG_GROUP_START(motor)
