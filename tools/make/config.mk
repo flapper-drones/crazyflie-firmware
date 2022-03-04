@@ -55,6 +55,10 @@ CFLAGS += -DDECK_FORCE=bcUSD:bcLedRing
 #########################################
 # CFLAGS += -DNIMBLE_MAX_THRUST 53000.0f
 
+## Disable tumble check ###
+###########################
+# CFLAGS += -DSUPERVISOR_TUMBLE_CHECK_DISABLE
+
 ## Do not change the settings below, unless if you know what you are doing ##
 #############################################################################
 

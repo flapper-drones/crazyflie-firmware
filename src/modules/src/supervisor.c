@@ -128,9 +128,11 @@ void supervisorUpdate(const sensorData_t *data)
   isFlying = isFlyingCheck();
 
   isTumbled = isTumbledCheck(data);
+  #ifndef SUPERVISOR_TUMBLE_CHECK_DISABLE
   if (isTumbled && isFlying) {
     stabilizerSetEmergencyStop();
   }
+  #endif
 
   canFly = canFlyCheck();
 }
