@@ -118,7 +118,7 @@ uint8_t flapperConfigPitchNeutral(void)
 
 uint8_t flapperConfigYawNeutral(void)
 {
-  return limitServoNeutral(flapperConfig.pitchServoNeutral);
+  return limitServoNeutral(flapperConfig.yawServoNeutral);
 }
 
 int8_t flapperConfigRollBias(void)
