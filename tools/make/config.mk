@@ -64,6 +64,7 @@ CFLAGS += -DDECK_FORCE=bcUSD:bcLedRing
 
 ## Uncomment when using CF2 as flight controller
 # CFLAGS += -DNIMBLE_USE_CF2
+# CFLAGS += -DMEASURE_VBAT_ON_PA3 #requires modification of the PCB: 10k / 1k voltage divider on PA3 and R44 removed
 
 CFLAGS += -DMOTOR_SETUP_NIMBLE
 # CFLAGS += -DENABLE_PWM_EXTENDED

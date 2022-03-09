@@ -55,6 +55,10 @@ void currentDeckInit(DeckInfo* info)
 
   xTaskCreate(currentDeckTask, CURRENTDECK_TASK_NAME, CURRENTDECK_TASK_STACKSIZE, NULL, CURRENTDECK_TASK_PRI, NULL);
 
+  #ifdef MEASURE_VBAT_ON_PA3
+  pmEnableExtBatteryVoltMeasuring(DECK_GPIO_RX2, 11.0f);
+  #endif
+
   isInit = true;
 }
 
@@ -83,10 +87,14 @@ void currentDeckTask(void* arg)
     current_last = reading_last*ampsPerVolt;
 
     // simple low pass filter
-    static float alpha = 0.975;
-    current = alpha*current + (1.0f - filter_alpha)*current_last;
+    current = filter_alpha*current + (1.0f - filter_alpha)*current_last;
 
+    #ifdef MEASURE_VBAT_ON_PA3
+    vbat = filter_alpha*vbat + (1.0f - filter_alpha)*pmMeasureExtBatteryVoltage();
+    #else
     vbat = pmGetBatteryVoltage();
+
+    #endif
     power = vbat * current;
   }
 }
@@ -95,11 +103,15 @@ static const DeckDriver current_deck = {
   .vid = 0xBC,
   .pid = 0x09,
   .name = "bcCurrentDeck",
+#ifdef MEASURE_VBAT_ON_PA3
+  .usedGpio = DECK_USING_PA2 | DECK_USING_PA3,
+#else
   .usedGpio = DECK_USING_PA2,
-
+#endif
   .init = currentDeckInit,
   .test = currentDeckTest,
 };
+
 
 DECK_DRIVER(current_deck);
 
