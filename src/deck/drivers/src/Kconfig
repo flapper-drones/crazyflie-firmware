@@ -96,6 +96,12 @@ config DECK_CPPM
     help
       Combined PPM / PPM-Sum driver.
 
+config DECK_CURRENT
+    bool "Support the current measurement deck"
+    default n
+    help
+      Current measurements via ADC on PA2/TX2.
+
 config DECK_FLOW
     bool "Support the Flow (v1 and v2) deck"
     default y

@@ -54,6 +54,7 @@
 #include "estimator.h"
 
 #include "sensors_bmi088_common.h"
+#include "platform_defaults.h"
 
 #define GYRO_ADD_RAW_AND_VARIANCE_LOG_VALUES
 
@@ -88,6 +89,22 @@
 #define GYRO_VARIANCE_THRESHOLD_Z       (GYRO_VARIANCE_BASE)
 
 #define SENSORS_ACC_SCALE_SAMPLES  200
+
+#ifdef DEFAULT_IMU_PHI
+  #define IMU_PHI DEFAULT_IMU_PHI
+#else 
+  #define IMU_PHI 0.0f
+#endif
+#ifdef DEFAULT_IMU_THETA 
+  #define IMU_THETA DEFAULT_IMU_THETA
+#else
+  #define IMU_THETA 0.0f
+#endif
+#ifdef DEFAULT_IMU_PSI 
+  #define IMU_PSI DEFAULT_IMU_PSI
+#else
+  #define IMU_PSI 0.0f
+#endif
 
 typedef struct
 {

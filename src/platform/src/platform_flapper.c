@@ -22,22 +22,47 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * platform_defaults.h - platform specific default values
+ * platform_bolt.c - platform functionality for the Crazyflie Bolt
  */
 
-#pragma once
 
-#define __INCLUDED_FROM_PLATFORM_DEFAULTS__
+#define DEBUG_MODULE "PLATFORM"
 
-#ifdef CONFIG_PLATFORM_CF2
-    #include "platform_defaults_cf2.h"
+#include <string.h>
+
+#include "platform.h"
+#include "exti.h"
+#include "nvic.h"
+#include "debug.h"
+
+static platformConfig_t configs[] = {
+#ifdef CONFIG_SENSORS_BMI088_SPI
+  {
+    .deviceType = "CB10",
+    .deviceTypeName = "Flapper",
+    .sensorImplementation = SensorImplementation_bmi088_spi_bmp388,
+    .physicalLayoutAntennasAreClose = false,
+    .motorMap = motorMapBoltBrushless,
+  }
 #endif
-#ifdef CONFIG_PLATFORM_BOLT
-    #include "platform_defaults_bolt.h"
-#endif
-#ifdef CONFIG_PLATFORM_TAG
-    #include "platform_defaults_tag.h"
-#endif
-#ifdef CONFIG_PLATFORM_FLAPPER
-    #include "platform_defaults_flapper.h"
-#endif
+};
+
+const platformConfig_t* platformGetListOfConfigurations(int* nrOfConfigs) {
+  *nrOfConfigs = sizeof(configs) / sizeof(platformConfig_t);
+  return configs;
+}
+
+void platformInitHardware() {
+  //Low level init: Clock and Interrupt controller
+  nvicInit();
+
+  //EXTI interrupts
+  extiInit();
+}
+
+
+// Config functions ------------------------
+
+const char* platformConfigGetPlatformName() {
+  return "flapper";
+}
