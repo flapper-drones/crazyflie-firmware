@@ -157,17 +157,17 @@ void powerStop()
   motorsSetRatio(MOTOR_M4, 0);
 }
 
-void powerDistribution(const control_t *control)
+void powerDistribution(motors_thrust_t* motorPower, const control_t *control)
 {
   thrust = fmin(control->thrust, NIMBLE_MAX_THRUST);
   
   flapperConfig.pitchServoNeutral=limitServoNeutral(flapperConfig.pitchServoNeutral);
   flapperConfig.yawServoNeutral=limitServoNeutral(flapperConfig.yawServoNeutral);
 
-  motorPower.m1 = limitThrust(flapperConfig.pitchServoNeutral*act_max/100.0f + pitch_ampl*control->pitch); // pitch servo
-  motorPower.m3 = limitThrust(flapperConfig.yawServoNeutral*act_max/100.0f - control->yaw); // yaw servo
-  motorPower.m2 = motor_zero + 1.0f/pwm_extended_ratio * limitThrust( 0.5f * control->roll + thrust * (1.0f + flapperConfig.rollBias/100.0f) ); // left motor
-  motorPower.m4 = motor_zero + 1.0f/pwm_extended_ratio * limitThrust(-0.5f * control->roll + thrust * (1.0f - flapperConfig.rollBias/100.0f) ); // right motor
+  motorPower->m1 = limitThrust(flapperConfig.pitchServoNeutral*act_max/100.0f + pitch_ampl*control->pitch); // pitch servo
+  motorPower->m3 = limitThrust(flapperConfig.yawServoNeutral*act_max/100.0f - control->yaw); // yaw servo
+  motorPower->m2 = motor_zero + 1.0f/pwm_extended_ratio * limitThrust( 0.5f * control->roll + thrust * (1.0f + flapperConfig.rollBias/100.0f) ); // left motor
+  motorPower->m4 = motor_zero + 1.0f/pwm_extended_ratio * limitThrust(-0.5f * control->roll + thrust * (1.0f - flapperConfig.rollBias/100.0f) ); // right motor
 
   if (motorSetEnable)
   {
@@ -178,10 +178,10 @@ void powerDistribution(const control_t *control)
   }
   else
   {
-    motorsSetRatio(MOTOR_M1, motorPower.m1);
-    motorsSetRatio(MOTOR_M2, motorPower.m2);
-    motorsSetRatio(MOTOR_M3, motorPower.m3);
-    motorsSetRatio(MOTOR_M4, motorPower.m4);
+    motorsSetRatio(MOTOR_M1, motorPower->m1);
+    motorsSetRatio(MOTOR_M2, motorPower->m2);
+    motorsSetRatio(MOTOR_M3, motorPower->m3);
+    motorsSetRatio(MOTOR_M4, motorPower->m4);
   }
 }
 
