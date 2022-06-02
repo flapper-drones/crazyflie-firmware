@@ -28,9 +28,10 @@
 
 #include "stabilizer_types.h"
 
+
 void powerDistributionInit(void);
 bool powerDistributionTest(void);
-void powerDistribution(const control_t *control);
+void powerDistribution(motors_thrust_t* motorPower, const control_t *control);
 void powerStop();
 
 #ifdef MOTOR_SETUP_NIMBLE
