@@ -56,7 +56,7 @@ static StateEstimatorType requiredEstimator = anyEstimator;
 static bool registerRequiredEstimator(StateEstimatorType estimator);
 static bool requiredLowInterferenceRadioMode = false;
 
-static char* deck_force = CONFIG_DECK_FORCE;
+static char* deck_force = "bcUSD:bcLedRing:bcCurrentDeck:bcCPPM";
 
 void deckInfoInit()
 {

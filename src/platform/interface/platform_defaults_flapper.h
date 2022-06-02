@@ -44,8 +44,8 @@
 
 // Default values for Nimble+ 2022
 //////////////////////////////////
-#define MOTOR_SERVO_PITCH 0
-#define MOTOR_SERVO_YAW 2
+// #define MOTOR_SERVO_PITCH 0
+// #define MOTOR_SERVO_YAW 2
 #define DEFAULT_IMU_PHI                   0.0f
 #define DEFAULT_IMU_THETA                -90.0f
 #define DEFAULT_IMU_PSI                   180.0f
@@ -81,9 +81,9 @@
 // #define NIMBLE_USE_CF2
 // #define MEASURE_VBAT_ON_PA3 // requires modification of the PCB: 10k / 1k voltage divider on PA3 and R44 removed
 
-#define MOTOR_SETUP_NIMBLE
+// #define MOTOR_SETUP_NIMBLE
 // #define ENABLE_PWM_EXTENDED
 
-#define YAW_MAX_DELTA 30.0f // Keep the yaw setpoint within +/- YAW_MAX_DELTA from the current heading
-#define PID_FILTER_ALL
-#define CPPM_USE_PA3 // CPPM pin, other alternatives:  PA7 (default), PA2(TX2), PA3(RX2), PB4(IO_3), PB5(IO_2) or PB8(IO_1)
+// #define YAW_MAX_DELTA 30.0f // Keep the yaw setpoint within +/- YAW_MAX_DELTA from the current heading
+// #define PID_FILTER_ALL
+// #define CPPM_USE_PA3 // CPPM pin, other alternatives:  PA7 (default), PA2(TX2), PA3(RX2), PB4(IO_3), PB5(IO_2) or PB8(IO_1)
