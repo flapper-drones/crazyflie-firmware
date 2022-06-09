@@ -87,10 +87,7 @@ static bool isFlyingCheck()
 {
   int sumRatio = 0;
   for (int i = 0; i < NBR_OF_MOTORS; ++i) {
-    if (i != MOTOR_SERVO_PITCH && i != MOTOR_SERVO_YAW) // TODO: create a list of propulsion motors and check only those
-    {
-      sumRatio += motorsGetRatio(i);
-    }
+    sumRatio += motorIsNotServo(i)*motorsGetRatio(i);
   }
 
   return sumRatio > SUPERVISOR_FLIGHT_THRESHOLD;

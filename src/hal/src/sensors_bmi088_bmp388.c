@@ -90,21 +90,6 @@
 
 #define SENSORS_ACC_SCALE_SAMPLES  200
 
-#ifdef DEFAULT_IMU_PHI
-  #define IMU_PHI DEFAULT_IMU_PHI
-#else 
-  #define IMU_PHI 0.0f
-#endif
-#ifdef DEFAULT_IMU_THETA 
-  #define IMU_THETA DEFAULT_IMU_THETA
-#else
-  #define IMU_THETA 0.0f
-#endif
-#ifdef DEFAULT_IMU_PSI 
-  #define IMU_PSI DEFAULT_IMU_PSI
-#else
-  #define IMU_PSI 0.0f
-#endif
 
 typedef struct
 {

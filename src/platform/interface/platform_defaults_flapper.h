@@ -22,7 +22,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * platform_defaults_flapper.h - platform specific default values for the bolt platform
+ * platform_defaults_flapper.h - platform specific default values for the Flapper platform
  */
 
 #pragma once
@@ -34,8 +34,8 @@
 // Defines for default values in the flapper platform
 
 // Default values for battery limits
-#define DEFAULT_BAT_LOW_VOLTAGE                   6.8f
-#define DEFAULT_BAT_CRITICAL_LOW_VOLTAGE          6.4f
+#define DEFAULT_BAT_LOW_VOLTAGE                   6.4f
+#define DEFAULT_BAT_CRITICAL_LOW_VOLTAGE          6.0f
 #define DEFAULT_BAT_LOW_DURATION_TO_TRIGGER_SEC   5
 
 // Default value for system shutdown in minutes after radio silence.
@@ -44,11 +44,9 @@
 
 // Default values for Nimble+ 2022
 //////////////////////////////////
-// #define MOTOR_SERVO_PITCH 0
-// #define MOTOR_SERVO_YAW 2
-#define DEFAULT_IMU_PHI                   0.0f
-#define DEFAULT_IMU_THETA                -90.0f
-#define DEFAULT_IMU_PSI                   180.0f
+#define IMU_PHI                   0.0f
+#define IMU_THETA                -90.0f
+#define IMU_PSI                   180.0f
 
 // External receiver settings
 /////////////////////////////
@@ -77,12 +75,8 @@
 // Do not change the settings below, unless if you know what you are doing //
 /////////////////////////////////////////////////////////////////////////////
 
-// Uncomment when using CF2 as flight controller
-// #define NIMBLE_USE_CF2
+// Applicable when using CF2 as flight controller
 // #define MEASURE_VBAT_ON_PA3 // requires modification of the PCB: 10k / 1k voltage divider on PA3 and R44 removed
-
-// #define MOTOR_SETUP_NIMBLE
-// #define ENABLE_PWM_EXTENDED
 
 // #define YAW_MAX_DELTA 30.0f // Keep the yaw setpoint within +/- YAW_MAX_DELTA from the current heading
 // #define PID_FILTER_ALL

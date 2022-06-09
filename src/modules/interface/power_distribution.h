@@ -32,9 +32,8 @@
 void powerDistributionInit(void);
 bool powerDistributionTest(void);
 void powerDistribution(motors_thrust_t* motorPower, const control_t *control);
-void powerStop();
 
-#ifdef MOTOR_SETUP_NIMBLE
+#ifdef CONFIG_POWER_DISTRIBUTION_FLAPPER
 int8_t extern flapperConfigRollBias(void);
 uint8_t extern flapperConfigPitchNeutral(void);
 uint8_t extern flapperConfigYawNeutral(void);

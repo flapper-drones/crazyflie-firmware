@@ -136,6 +136,13 @@ config POWER_DISTRIBUTION_QUADROTOR
     depends on PLATFORM_CF2 || PLATFORM_BOLT || PLATFORM_TAG
     help
         Power distribution function for quadrotors
+
+config POWER_DISTRIBUTION_FLAPPER
+    bool "Flapper power distribution"
+    depends on PLATFORM_FLAPPER
+    help
+        Power distribution function for flappers
+
 endchoice
 
 endmenu

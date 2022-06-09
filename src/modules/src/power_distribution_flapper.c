@@ -31,26 +31,21 @@
 #include "log.h"
 #include "param.h"
 #include "num.h"
+#include "autoconf.h"
+#include "config.h"
+
 #include "platform.h"
 #include "motors.h"
 #include "debug.h"
 #include "math.h"
 
-static bool motorSetEnable = false;
+#ifndef CONFIG_MOTORS_DEFAULT_IDLE_THRUST
+#  define DEFAULT_IDLE_THRUST 0
+#else
+#  define DEFAULT_IDLE_THRUST CONFIG_MOTORS_DEFAULT_IDLE_THRUST
+#endif
 
-static struct {
-  uint32_t m1;
-  uint32_t m2;
-  uint32_t m3;
-  uint32_t m4;
-} motorPower;
-
-static struct {
-  uint16_t m1;
-  uint16_t m2;
-  uint16_t m3;
-  uint16_t m4;
-} motorPowerSet;
+static uint32_t idleThrust = DEFAULT_IDLE_THRUST;
 
 struct flapperConfig_s {
   uint8_t pitchServoNeutral;
@@ -65,23 +60,13 @@ struct flapperConfig_s flapperConfig = {
 };
 
 static float thrust;
-
 static uint16_t act_max = 65535;
 
 #ifndef NIMBLE_MAX_THRUST
   #define NIMBLE_MAX_THRUST 60000.0f
 #endif
 
-
-#ifdef ENABLE_PWM_EXTENDED
-  static uint16_t motor_zero = 9362; // for extended PWM (stroke = 1.4 ms): motor_min = (act_max - act_max/1.4)/2
-  static float pwm_extended_ratio = 1.4;
-  static float pitch_ampl = 0.4f/1.4f; // 1 = full servo stroke
-#else
-  static uint16_t motor_zero = 0;
-  static float pwm_extended_ratio = 1.0;
-  static float pitch_ampl = 0.4f; // 1 = full servo stroke
-#endif
+static float pitch_ampl = 0.4f; // 1 = full servo stroke
 
 uint8_t limitServoNeutral(uint8_t value)
 {
@@ -129,33 +114,21 @@ int8_t flapperConfigRollBias(void)
 void powerDistributionInit(void)
 
 {
-  #ifdef NIMBLE_USE_CF2
-  motorsInit(motorMapDefaltConBrushless);
-  DEBUG_PRINT("Using Flapper Drone power distribution | CF2.1\n");
+  #ifdef FLAPPER_REVB
+    DEBUG_PRINT("Using Flapper power distribution | PCB revB (2021)\n");
   #else
-  motorsInit(platformConfigGetMotorMapping());
-  DEBUG_PRINT("Using Flapper Drone power distribution | CF Bolt\n");
+    DEBUG_PRINT("Using Flapper power distribution | PCB revD (2022) or newer\n");
   #endif
+  
 }
 
 bool powerDistributionTest(void)
 {
   bool pass = true;
-
-  pass &= motorsTest();
-
   return pass;
 }
 
 #define limitThrust(VAL) limitUint16(VAL)
-
-void powerStop()
-{
-  motorsSetRatio(MOTOR_M1, limitThrust(flapperConfig.pitchServoNeutral*act_max/100.0f));
-  motorsSetRatio(MOTOR_M2, 0);
-  motorsSetRatio(MOTOR_M3, limitThrust(flapperConfig.yawServoNeutral*act_max/100.0f));
-  motorsSetRatio(MOTOR_M4, 0);
-}
 
 void powerDistribution(motors_thrust_t* motorPower, const control_t *control)
 {
@@ -164,34 +137,45 @@ void powerDistribution(motors_thrust_t* motorPower, const control_t *control)
   flapperConfig.pitchServoNeutral=limitServoNeutral(flapperConfig.pitchServoNeutral);
   flapperConfig.yawServoNeutral=limitServoNeutral(flapperConfig.yawServoNeutral);
 
-  motorPower->m1 = limitThrust(flapperConfig.pitchServoNeutral*act_max/100.0f + pitch_ampl*control->pitch); // pitch servo
-  motorPower->m3 = limitThrust(flapperConfig.yawServoNeutral*act_max/100.0f - control->yaw); // yaw servo
-  motorPower->m2 = motor_zero + 1.0f/pwm_extended_ratio * limitThrust( 0.5f * control->roll + thrust * (1.0f + flapperConfig.rollBias/100.0f) ); // left motor
-  motorPower->m4 = motor_zero + 1.0f/pwm_extended_ratio * limitThrust(-0.5f * control->roll + thrust * (1.0f - flapperConfig.rollBias/100.0f) ); // right motor
+  #ifdef FLAPPER_REVB
+    motorPower->m2 = limitThrust(flapperConfig.pitchServoNeutral*act_max/100.0f + pitch_ampl*control->pitch); // pitch servo
+    motorPower->m3 = limitThrust(flapperConfig.yawServoNeutral*act_max/100.0f - control->yaw); // yaw servo
+    motorPower->m1 = limitThrust( 0.5f * control->roll + thrust * (1.0f + flapperConfig.rollBias/100.0f) ); // left motor
+    motorPower->m4 = limitThrust(-0.5f * control->roll + thrust * (1.0f - flapperConfig.rollBias/100.0f) ); // right motor
+  #else
+    motorPower->m1 = limitThrust(flapperConfig.pitchServoNeutral*act_max/100.0f + pitch_ampl*control->pitch); // pitch servo
+    motorPower->m3 = limitThrust(flapperConfig.yawServoNeutral*act_max/100.0f - control->yaw); // yaw servo
+    motorPower->m2 = limitThrust( 0.5f * control->roll + thrust * (1.0f + flapperConfig.rollBias/100.0f) ); // left motor
+    motorPower->m4 = limitThrust(-0.5f * control->roll + thrust * (1.0f - flapperConfig.rollBias/100.0f) ); // right motor
+  #endif
 
-  if (motorSetEnable)
-  {
-    motorsSetRatio(MOTOR_M1, motorPowerSet.m1);
-    motorsSetRatio(MOTOR_M2, motorPowerSet.m2);
-    motorsSetRatio(MOTOR_M3, motorPowerSet.m3);
-    motorsSetRatio(MOTOR_M4, motorPowerSet.m4);
+  if (motorPower->m1 < idleThrust) {
+    motorPower->m1 = idleThrust;
   }
-  else
-  {
-    motorsSetRatio(MOTOR_M1, motorPower->m1);
-    motorsSetRatio(MOTOR_M2, motorPower->m2);
-    motorsSetRatio(MOTOR_M3, motorPower->m3);
-    motorsSetRatio(MOTOR_M4, motorPower->m4);
+  if (motorPower->m2 < idleThrust) {
+    motorPower->m2 = idleThrust;
+  }
+  if (motorPower->m3 < idleThrust) {
+    motorPower->m3 = idleThrust;
+  }
+  if (motorPower->m4 < idleThrust) {
+    motorPower->m4 = idleThrust;
   }
 }
 
-PARAM_GROUP_START(motorPowerSet)
-PARAM_ADD(PARAM_UINT8, enable, &motorSetEnable)
-PARAM_ADD(PARAM_UINT16, m1, &motorPowerSet.m1)
-PARAM_ADD(PARAM_UINT16, m2, &motorPowerSet.m2)
-PARAM_ADD(PARAM_UINT16, m3, &motorPowerSet.m3)
-PARAM_ADD(PARAM_UINT16, m4, &motorPowerSet.m4)
-PARAM_GROUP_STOP(motorPowerSet)
+/**
+ * Power distribution parameters
+ */
+PARAM_GROUP_START(powerDist)
+/**
+ * @brief Motor thrust to set at idle (default: 0)
+ *
+ * This is often needed for brushless motors as
+ * it takes time to start up the motor. Then a
+ * common value is between 3000 - 6000.
+ */
+PARAM_ADD_CORE(PARAM_UINT32 | PARAM_PERSISTENT, idleThrust, &idleThrust)
+PARAM_GROUP_STOP(powerDist)
 
 /**
  *
@@ -223,10 +207,3 @@ PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, servPitchNeutr, &flapperConfig.pitchSe
 PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, servYawNeutr, &flapperConfig.yawServoNeutral)
 
 PARAM_GROUP_STOP(_flapper)
-
-LOG_GROUP_START(motor)
-LOG_ADD(LOG_UINT32, m1, &motorPower.m1)
-LOG_ADD(LOG_UINT32, m2, &motorPower.m2)
-LOG_ADD(LOG_UINT32, m3, &motorPower.m3)
-LOG_ADD(LOG_UINT32, m4, &motorPower.m4)
-LOG_GROUP_STOP(motor)
