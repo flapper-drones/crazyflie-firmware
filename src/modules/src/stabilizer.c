@@ -311,6 +311,9 @@ static void stabilizerTask(void* param)
         }
       }
     }
+#ifdef CONFIG_MOTORS_ESC_PROTOCOL_DSHOT
+    motorsBurstDshot();
+#endif
   }
 }
 
