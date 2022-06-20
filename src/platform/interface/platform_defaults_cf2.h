@@ -41,8 +41,3 @@
 // Default value for system shutdown in minutes after radio silence.
 // Requires kbuild config ENABLE_AUTO_SHUTDOWN to be activated.
 #define DEFAULT_SYSTEM_SHUTDOWN_TIMEOUT_MIN       5
-
-// Default Euler angles defining IMU orientation on the airframe
-#define IMU_PHI 0.0f
-#define IMU_THETA 0.0f
-#define IMU_PSI 0.0f
