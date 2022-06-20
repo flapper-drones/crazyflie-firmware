@@ -32,6 +32,7 @@
 #include "param.h"
 #include "log.h"
 #include "commander.h"
+#include "platform_defaults.h"
 
 #define ATTITUDE_LPF_CUTOFF_FREQ      15.0f
 #define ATTITUDE_LPF_ENABLE false
@@ -48,6 +49,7 @@ float omxFiltCutoff = ATTITUDE_ROLL_RATE_LPF_CUTOFF_FREQ;
 float omyFiltCutoff = ATTITUDE_PITCH_RATE_LPF_CUTOFF_FREQ;
 float omzFiltCutoff = ATTITUDE_YAW_RATE_LPF_CUTOFF_FREQ;
 float yawFeedForw = ATTITUDE_RATE_FF_YAW;
+float yawMaxDelta = YAW_MAX_DELTA;
 
 static inline int16_t saturateSignedInt16(float in)
 {
@@ -208,6 +210,11 @@ void attitudeControllerGetActuatorOutput(int16_t* roll, int16_t* pitch, int16_t*
   *yaw = yawOutput;
 }
 
+float attitudeControllerGetYawMaxDelta(void)
+{
+  return yawMaxDelta;
+}
+
 /**
  *  Log variables of attitude PID controller
  */ 
@@ -338,6 +345,10 @@ PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, yaw_kd, &pidYaw.kd)
  * @brief Feedforward gain for the yaw controller
  */
 PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, yawFeedForw, &yawFeedForw)
+/**
+ * @brief If nonzero, yaw setpoint can only be set within +/- yawMaxDelta from the current yaw
+ */
+PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, yawMaxDelta, &yawMaxDelta)
 PARAM_GROUP_STOP(pid_attitude)
 
 /**

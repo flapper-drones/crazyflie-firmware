@@ -78,6 +78,6 @@
 // Applicable when using CF2 as flight controller
 // #define MEASURE_VBAT_ON_PA3 // requires modification of the PCB: 10k / 1k voltage divider on PA3 and R44 removed
 
-// #define YAW_MAX_DELTA 30.0f // Keep the yaw setpoint within +/- YAW_MAX_DELTA from the current heading
+#define YAW_MAX_DELTA 30.0f // Keep the yaw setpoint within +/- YAW_MAX_DELTA from the current heading
 // #define PID_FILTER_ALL
 // #define CPPM_USE_PA3 // CPPM pin, other alternatives:  PA7 (default), PA2(TX2), PA3(RX2), PB4(IO_3), PB5(IO_2) or PB8(IO_1)

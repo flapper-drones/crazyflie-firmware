@@ -106,7 +106,6 @@ ifeq ($(CONFIG_PLATFORM_FLAPPER),y)
 PLATFORM = flapper
 # ARCH_CFLAGS += -DFLAPPER_REVB
 ARCH_CFLAGS += -DPM_CURRENT_FILTER_ALPHA=0.975f
-ARCH_CFLAGS += -DYAW_MAX_DELTA=30.0f # Keep the yaw setpoint within +/- YAW_MAX_DELTA from the current heading
 ARCH_CFLAGS += -DPID_FILTER_ALL
 ARCH_CFLAGS += -DCPPM_USE_PA3 # CPPM pin, other alternatives:  PA7 (default), PA2(TX2), PA3(RX2), PB4(IO_3), PB5(IO_2) or PB8(IO_1)
 endif
