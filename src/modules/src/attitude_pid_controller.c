@@ -42,6 +42,10 @@
 #define ATTITUDE_RATE_LPF_ENABLE true
 #define ATTITUDE_RATE_FF_YAW 220.0f
 
+#ifndef YAW_MAX_DELTA
+    #define YAW_MAX_DELTA     0.0f
+#endif
+
 bool attFiltEnable = ATTITUDE_LPF_ENABLE;
 bool rateFiltEnable = ATTITUDE_RATE_LPF_ENABLE;
 float attFiltCutoff = ATTITUDE_LPF_CUTOFF_FREQ;
