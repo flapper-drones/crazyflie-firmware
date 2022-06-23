@@ -44,9 +44,15 @@
 
 // Default values for Nimble+ 2022
 //////////////////////////////////
-#define IMU_PHI                   0.0f
-#define IMU_THETA                -90.0f
-#define IMU_PSI                   180.0f
+#if CONFIG_POWER_DISTRIBUTION_FLAPPER_REVB
+    #define IMU_PHI                   0.0f
+    #define IMU_THETA                 90.0f
+    #define IMU_PSI                   180.0f
+#else
+    #define IMU_PHI                   0.0f
+    #define IMU_THETA                -90.0f
+    #define IMU_PSI                   180.0f
+#endif
 
 // Disable tumble check //
 //////////////////////////

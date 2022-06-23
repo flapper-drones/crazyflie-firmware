@@ -277,7 +277,7 @@ void motorsInit(const MotorPerifDef** motorMapSelect)
 
 // For platforms that use servos, set motor numbers and motor stop values
   #ifdef CONFIG_POWER_DISTRIBUTION_FLAPPER
-    #ifdef FLAPPER_REVB
+    #ifdef CONFIG_POWER_DISTRIBUTION_FLAPPER_REVB
       motor_is_servo[1]= true;
       motor_is_servo[2]= true;
       motor_ratios_stop[1]=(uint32_t) flapperConfigPitchNeutral()*65535/100.0f;

@@ -112,7 +112,7 @@ int8_t flapperConfigRollBias(void)
 void powerDistributionInit(void)
 
 {
-  #ifdef FLAPPER_REVB
+  #if CONFIG_POWER_DISTRIBUTION_FLAPPER_REVB
     DEBUG_PRINT("Using Flapper power distribution | PCB revB (2021)\n");
   #else
     DEBUG_PRINT("Using Flapper power distribution | PCB revD (2022) or newer\n");
@@ -135,7 +135,7 @@ void powerDistribution(motors_thrust_t* motorPower, const control_t *control)
   flapperConfig.pitchServoNeutral=limitServoNeutral(flapperConfig.pitchServoNeutral);
   flapperConfig.yawServoNeutral=limitServoNeutral(flapperConfig.yawServoNeutral);
 
-  #ifdef FLAPPER_REVB
+  #if CONFIG_POWER_DISTRIBUTION_FLAPPER_REVB
     motorPower->m2 = limitThrust(flapperConfig.pitchServoNeutral*act_max/100.0f + pitch_ampl*control->pitch); // pitch servo
     motorPower->m3 = limitThrust(flapperConfig.yawServoNeutral*act_max/100.0f - control->yaw); // yaw servo
     motorPower->m1 = limitThrust( 0.5f * control->roll + thrust * (1.0f + flapperConfig.rollBias/100.0f) ); // left motor

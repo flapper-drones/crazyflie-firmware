@@ -22,3 +22,6 @@ CONFIG_DECK_CPPM_USE_PA3=y
 
 # Applicable when using CF2 as flight controller
 # CONFIG_DECK_CURRENT_MEASURE_VBAT_ON_PA3 # requires modification of the PCB: 10k / 1k voltage divider on PA3 and R44 removed
+
+# For Flappers prior to 2022 (PCB revB)
+# CONFIG_POWER_DISTRIBUTION_FLAPPER_REVB=y

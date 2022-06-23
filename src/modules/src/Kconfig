@@ -157,6 +157,13 @@ config POWER_DISTRIBUTION_FLAPPER
 
 endchoice
 
+config POWER_DISTRIBUTION_FLAPPER_REVB
+    bool "Flapper power distribution (PCB revision B)"
+    depends on POWER_DISTRIBUTION_FLAPPER
+    default n
+    help
+        Power distribution function for flappers
+
 endmenu
 
 menu "Parameter subsystem"
