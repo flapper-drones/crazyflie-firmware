@@ -55,7 +55,7 @@ void currentDeckInit(DeckInfo* info)
 
   xTaskCreate(currentDeckTask, CURRENTDECK_TASK_NAME, CURRENTDECK_TASK_STACKSIZE, NULL, CURRENTDECK_TASK_PRI, NULL);
 
-  #ifdef MEASURE_VBAT_ON_PA3
+  #ifdef CONFIG_DECK_CURRENT_MEASURE_VBAT_ON_PA3
   pmEnableExtBatteryVoltMeasuring(DECK_GPIO_RX2, 11.0f);
   #endif
 
