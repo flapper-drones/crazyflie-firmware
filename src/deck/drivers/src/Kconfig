@@ -91,10 +91,35 @@ config DECK_BUZZ
         there are already a few melodies pre-programmed that you can use.
 
 config DECK_CPPM
-    bool "Support the CPPM deck (obsolete)"
+    bool "Support the CPPM deck"
     default n
     help
       Combined PPM / PPM-Sum driver.
+
+choice
+  prompt "CPPM pin"
+  depends on DECK_CPPM
+  default DECK_CPPM_USE_PA3
+
+config DECK_CPPM_USE_PB4
+    bool "PB4/IO_3"
+
+config DECK_CPPM_USE_PB5
+    bool "PB5/IO_2"
+
+config DECK_CPPM_USE_PB8
+    bool "PB8/IO_1"
+
+config DECK_CPPM_USE_PA2
+    bool "PA2/TX2"
+
+config DECK_CPPM_USE_PA3
+    bool "PA3/RX2"
+
+config DECK_CPPM_USE_PA7
+    bool "PA7/MOSI"
+
+endchoice      
 
 config DECK_CURRENT
     bool "Support the current measurement deck"
