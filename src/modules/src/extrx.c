@@ -88,27 +88,18 @@ bool extRxArm = false;
 bool extRxAltHold = false;
 bool extRxModeRate = false;
   
-#ifndef EXTRX_ARMING
-  #define EXTRX_ARMING    false
-#endif
-#if EXTRX_ARMING
+#if CONFIG_DECK_EXTRX_ARMING
   bool extRxArmPrev = false;
   int8_t arm_cnt = 0;
 #endif
 
-#ifndef EXTRX_ALT_HOLD
-  #define EXTRX_ALT_HOLD    false
-#endif
-#if EXTRX_ALT_HOLD
+#if CONFIG_DECK_EXTRX_ALT_HOLD
   #define EXTRX_DEADBAND_ZVEL  (0.25f)
   bool extRxAltHoldPrev = false;
   int8_t altHold_cnt = 0;
 #endif
 
-#ifndef EXTRX_MODE_RATE
-  #define EXTRX_MODE_RATE  true
-#endif
-#if EXTRX_MODE_RATE
+#if CONFIG_DECK_EXTRX_MODE_RATE
   bool extRxModeRatePrev = false;
   int8_t modeRate_cnt = 0;
 #endif
@@ -132,7 +123,7 @@ void extRxInit(void)
 
 #ifdef ENABLE_CPPM
   cppmInit();
-  #ifdef EXTRX_TAER
+  #ifdef CONFIG_DECK_EXTRX_TAER
     DEBUG_PRINT("CPPM initialized, expecting TAER channel mapping\n");
   #else
     DEBUG_PRINT("CPPM initialized, expecting AETR channel mapping\n");
@@ -163,7 +154,7 @@ static void extRxTask(void *param)
 static void extRxDecodeChannels(void)
 {
   
-  #if EXTRX_ARMING
+  #if CONFIG_DECK_EXTRX_ARMING
   if (EXTRX_SIGN_ARM * cppmConvert2Float(ch[EXTRX_CH_ARM], -1, 1, 0.0) > 0.5f) // channel needs to be 75% or more to work correctly with 2/3 way switches
   {
     if (arm_cnt < EXTRX_SWITCH_MIN_CNT) arm_cnt++;
@@ -190,7 +181,7 @@ static void extRxDecodeChannels(void)
   extRxArmPrev = extRxArm;
   #endif
 
-  #if EXTRX_ALT_HOLD
+  #if CONFIG_DECK_EXTRX_ALT_HOLD
   if (EXTRX_SIGN_ALTHOLD * cppmConvert2Float(ch[EXTRX_CH_ALTHOLD], -1, 1, 0.0) > 0.5f)
   {
     if (altHold_cnt < EXTRX_SWITCH_MIN_CNT) altHold_cnt++;
@@ -226,7 +217,7 @@ static void extRxDecodeChannels(void)
   extrxSetpoint.thrust = cppmConvert2uint16(ch[EXTRX_CH_THRUST]);
   #endif
 
-  #if EXTRX_MODE_RATE
+  #if CONFIG_DECK_EXTRX_MODE_RATE
   if (EXTRX_SIGN_MODE * cppmConvert2Float(ch[EXTRX_CH_MODE], -1, 1, 0.0) > 0.5f) // channel needs to be 75% or more to work correctly with 2/3 way switches
   {
     if (modeRate_cnt < EXTRX_SWITCH_MIN_CNT) modeRate_cnt++;
