@@ -148,6 +148,15 @@ static bool isBarometerPresent = false;
 static uint8_t baroMeasDelayMin = SENSORS_DELAY_BARO;
 
 // IMU alignment Euler angles
+#ifndef IMU_PHI
+    #define IMU_PHI     0.0f
+#endif
+#ifndef IMU_THETA
+    #define IMU_THETA   0.0f
+#endif
+#ifndef IMU_PSI
+    #define IMU_PSI     0.0f
+#endif
 static float imuPhi = IMU_PHI;
 static float imuTheta = IMU_THETA;
 static float imuPsi = IMU_PSI;

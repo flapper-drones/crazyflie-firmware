@@ -42,17 +42,6 @@
     #include "platform_defaults_flapper.h"
 #endif
 
-// Default IMU alignment angles
-#ifndef IMU_PHI
-    #define IMU_PHI     0.0f
-#endif
-#ifndef IMU_THETA
-    #define IMU_THETA   0.0f
-#endif
-#ifndef IMU_PSI
-    #define IMU_PSI     0.0f
-#endif
-
 // Keep the yaw setpoint within +/- YAW_MAX_DELTA from the current heading if nonzero
 #ifndef YAW_MAX_DELTA
     #define YAW_MAX_DELTA     0.0f
