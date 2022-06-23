@@ -48,36 +48,6 @@
 #define IMU_THETA                -90.0f
 #define IMU_PSI                   180.0f
 
-// External receiver settings
-/////////////////////////////
-// #define EXTRX_ALT_HOLD // enable altitude hold with external Rx
-// #define EXTRX_ARMING // enable arming with external Rx (setup via "Brushless handling" compile flags)
-// #define EXTRX_TAER // use TAER channel mapping instead of the default AETR - Aileron(Roll), Elevator(Pitch), Thrust, Rudder(Yaw)
-
-// RGB LED settings //
-//////////////////////
-// #define TURN_OFF_LED
-// #define LEDRING_DEFAULT_EFFECT 7
-// #define LED_RING_NBR_LEDS 12
-
-// Better baro hold with no additional sensors //
-/////////////////////////////////////////////////
-// #define IMPROVED_BARO_Z_HOLD
-
-// Limit maximal thrust (100% = 65535) //
-/////////////////////////////////////////
-// #define NIMBLE_MAX_THRUST 53000.0f
-
 // Disable tumble check //
 //////////////////////////
 #define SUPERVISOR_TUMBLE_CHECK_DISABLE
-
-// Do not change the settings below, unless if you know what you are doing //
-/////////////////////////////////////////////////////////////////////////////
-
-// Applicable when using CF2 as flight controller
-// #define MEASURE_VBAT_ON_PA3 // requires modification of the PCB: 10k / 1k voltage divider on PA3 and R44 removed
-
-#define YAW_MAX_DELTA 30.0f // Keep the yaw setpoint within +/- YAW_MAX_DELTA from the current heading
-// #define PID_FILTER_ALL
-// #define CPPM_USE_PA3 // CPPM pin, other alternatives:  PA7 (default), PA2(TX2), PA3(RX2), PB4(IO_3), PB5(IO_2) or PB8(IO_1)

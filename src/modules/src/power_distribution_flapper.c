@@ -51,20 +51,18 @@ struct flapperConfig_s {
   uint8_t pitchServoNeutral;
   uint8_t yawServoNeutral;
   int8_t rollBias;
+  uint16_t maxThrust;
 };
 
 struct flapperConfig_s flapperConfig = {
   .pitchServoNeutral = 50,
   .yawServoNeutral = 50,
   .rollBias = 0,
+  .maxThrust = 60000,
 };
 
 static float thrust;
 static uint16_t act_max = 65535;
-
-#ifndef NIMBLE_MAX_THRUST
-  #define NIMBLE_MAX_THRUST 60000.0f
-#endif
 
 static float pitch_ampl = 0.4f; // 1 = full servo stroke
 
@@ -132,7 +130,7 @@ bool powerDistributionTest(void)
 
 void powerDistribution(motors_thrust_t* motorPower, const control_t *control)
 {
-  thrust = fmin(control->thrust, NIMBLE_MAX_THRUST);
+  thrust = fmin(control->thrust, flapperConfig.maxThrust);
   
   flapperConfig.pitchServoNeutral=limitServoNeutral(flapperConfig.pitchServoNeutral);
   flapperConfig.yawServoNeutral=limitServoNeutral(flapperConfig.yawServoNeutral);
@@ -205,5 +203,12 @@ PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, servPitchNeutr, &flapperConfig.pitchSe
  * you observe drift in the clock-wise direction, increase this parameter and vice-versa if the drift is counter-clock-wise.
  */
 PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, servYawNeutr, &flapperConfig.yawServoNeutral)
+/**
+ * @brief Yaw servo neutral <25%; 75%> (default 50%)
+ *
+ * The parameter sets the neutral position of the yaw servo, such that the yaw control arm is pointed spanwise. If in flight 
+ * you observe drift in the clock-wise direction, increase this parameter and vice-versa if the drift is counter-clock-wise.
+ */
+PARAM_ADD(PARAM_UINT16 | PARAM_PERSISTENT, nimbleMaxThrust, &flapperConfig.maxThrust)
 
 PARAM_GROUP_STOP(_flapper)
