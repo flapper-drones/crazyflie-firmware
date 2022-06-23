@@ -25,12 +25,6 @@
  * pid.c - implementation of the PID regulator
  */
 
-#ifdef IMPROVED_BARO_Z_HOLD
-#ifndef PID_FILTER_ALL
-#define PID_FILTER_ALL
-#endif
-#endif
-
 #include "pid.h"
 #include "num.h"
 #include <math.h>
@@ -75,7 +69,7 @@ float pidUpdate(PidObject* pid, const float measured, const bool updateError)
     
 // filter out too large changes, e.g. when yaw goes from -180deg to 180deg
     if (fabs(pid->error - pid->prevError) > 180) deriv = 0;
-#ifdef PID_FILTER_ALL
+    #if CONFIG_CONTROLLER_PID_FILTER_ALL
       pid->deriv = deriv;
     #else
       if (pid->enableDFilter){
@@ -101,7 +95,7 @@ float pidUpdate(PidObject* pid, const float measured, const bool updateError)
     pid->outI = pid->ki * pid->integ;
     output += pid->outI;
     
-    #ifdef PID_FILTER_ALL
+    #if CONFIG_CONTROLLER_PID_FILTER_ALL
       //filter complete output instead of only D component to compensate for increased noise from increased barometer influence
       if (pid->enableDFilter)
       {

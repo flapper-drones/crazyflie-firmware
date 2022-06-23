@@ -80,7 +80,7 @@ float velFiltCutoff = 10.0f;
 bool posZFiltEnable = true;
 bool velZFiltEnable = true;
 float posZFiltCutoff = 20.0f;
-#ifdef IMPROVED_BARO_Z_HOLD
+#if CONFIG_CONTROLLER_PID_IMPROVED_BARO_Z_HOLD
 float velZFiltCutoff = 0.7f;
 #else
 float velZFiltCutoff = 10.0f;
@@ -105,7 +105,7 @@ static struct this_s this = {
     },
     .pid.dt = DT,
   },
-  #ifdef IMPROVED_BARO_Z_HOLD
+  #if CONFIG_CONTROLLER_PID_IMPROVED_BARO_Z_HOLD
     .pidVZ = {
       .pid = {
         .kp = 4.0f,
@@ -150,7 +150,7 @@ static struct this_s this = {
     },
     .pid.dt = DT,
   },
-  #ifdef IMPROVED_BARO_Z_HOLD
+  #if CONFIG_CONTROLLER_PID_IMPROVED_BARO_Z_HOLD
     .thrustBase = 40000,
   #else
     .thrustBase = 40000,
