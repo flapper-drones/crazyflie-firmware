@@ -41,3 +41,4 @@
 // Default value for system shutdown in minutes after radio silence.
 // Requires kbuild config ENABLE_AUTO_SHUTDOWN to be activated.
 #define DEFAULT_SYSTEM_SHUTDOWN_TIMEOUT_MIN       5
+

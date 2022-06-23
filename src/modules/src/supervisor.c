@@ -35,18 +35,10 @@
 #include "supervisor.h"
 
 /* Minimum summed motor PWM that means we are flying */
-#define SUPERVISOR_FLIGHT_THRESHOLD 500
+#define SUPERVISOR_FLIGHT_THRESHOLD 1000
 
 /* Number of times in a row we need to see a condition before acting upon it */
 #define SUPERVISOR_HYSTERESIS_THRESHOLD 30
-
-#ifndef MOTOR_SERVO_PITCH
-#define MOTOR_SERVO_PITCH NBR_OF_MOTORS
-#endif
-
-#ifndef MOTOR_SERVO_YAW
-#define MOTOR_SERVO_YAW NBR_OF_MOTORS+1
-#endif
 
 static bool canFly;
 static bool isFlying;
