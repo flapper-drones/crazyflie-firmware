@@ -104,7 +104,6 @@ endif
 
 ifeq ($(CONFIG_PLATFORM_FLAPPER),y)
 PLATFORM = flapper
-# ARCH_CFLAGS += -DFLAPPER_REVB
 endif
 
 
