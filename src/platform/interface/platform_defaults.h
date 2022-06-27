@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include "autoconf.h"
+
 #define __INCLUDED_FROM_PLATFORM_DEFAULTS__
 
 #ifdef CONFIG_PLATFORM_CF2
@@ -41,3 +43,4 @@
 #ifdef CONFIG_PLATFORM_FLAPPER
     #include "platform_defaults_flapper.h"
 #endif
+
