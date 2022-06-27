@@ -73,3 +73,42 @@
 #define PID_YAW_KD  0.35
 #define PID_YAW_INTEGRATION_LIMIT     360.0
 
+#define PID_VEL_X_KP 25.0f
+#define PID_VEL_X_KI 1.0f
+#define PID_VEL_X_KD 0.0f
+#define PID_VEL_X_KFF 0.0f
+
+#define PID_VEL_Y_KP 25.0f
+#define PID_VEL_Y_KI 1.0f
+#define PID_VEL_Y_KD 0.0f
+#define PID_VEL_Y_KFF 0.0f
+
+#define PID_VEL_Z_KP 25.0f
+#define PID_VEL_Z_KI 15.0f
+#define PID_VEL_Z_KD 0.0f
+
+#define PID_VEL_Z_KP_BARO_Z_HOLD 3.0f
+#define PID_VEL_Z_KI_BARO_Z_HOLD 1.0f
+#define PID_VEL_Z_KD_BARO_Z_HOLD 1.5f
+
+#define PID_VEL_ROLL_MAX 20.0f
+#define PID_VEL_PITCH_MAX 20.0f
+#define PID_VEL_THRUST_BASE 36000.0f
+#define PID_VEL_THRUST_BASE_BARO_Z_HOLD 38000.0f
+#define PID_VEL_THRUST_MIN 20000.0f
+
+#define PID_POS_X_KP 2.0f
+#define PID_POS_X_KI 0.0f
+#define PID_POS_X_KD 0.0f
+
+#define PID_POS_Y_KP 2.0f
+#define PID_POS_Y_KI 0.0f
+#define PID_POS_Y_KD 0.0f
+
+#define PID_POS_Z_KP 2.0f
+#define PID_POS_Z_KI 0.5f
+#define PID_POS_Z_KD 0.0f
+
+#define PID_POS_VEL_X_MAX 1.0f
+#define PID_POS_VEL_Y_MAX 0.0f
+#define PID_POS_VEL_Z_MAX 0.0f

@@ -51,6 +51,7 @@
 #include "filter.h"
 #include "static_mem.h"
 #include "estimator.h"
+#include "platform_defaults.h"
 
 #define SENSORS_ENABLE_PRESSURE_LPS25H
 //#define GYRO_ADD_RAW_AND_VARIANCE_LOG_VALUES
