@@ -44,6 +44,7 @@
     #include "platform_defaults_flapper.h"
 #endif
 
+// IMU alignment on the airframe 
 #ifndef IMU_PHI
     #define IMU_PHI     0.0f
 #endif
@@ -52,6 +53,29 @@
 #endif
 #ifndef IMU_PSI
     #define IMU_PSI     0.0f
+#endif
+
+// Attitude PID control filter settings
+#ifndef ATTITUDE_LPF_CUTOFF_FREQ 
+    #define ATTITUDE_LPF_CUTOFF_FREQ      15.0f
+#endif
+#ifndef ATTITUDE_LPF_ENABLE false
+    #define ATTITUDE_LPF_ENABLE false
+#endif
+#ifndef ATTITUDE_ROLL_RATE_LPF_CUTOFF_FREQ
+    #define ATTITUDE_ROLL_RATE_LPF_CUTOFF_FREQ 30.0f
+#endif
+#ifndef ATTITUDE_PITCH_RATE_LPF_CUTOFF_FREQ
+    #define ATTITUDE_PITCH_RATE_LPF_CUTOFF_FREQ 30.0f
+#endif
+#ifndef ATTITUDE_YAW_RATE_LPF_CUTOFF_FREQ
+    #define ATTITUDE_YAW_RATE_LPF_CUTOFF_FREQ 30.0f
+#endif
+#ifndef ATTITUDE_RATE_LPF_ENABLE
+    #define ATTITUDE_RATE_LPF_ENABLE false
+#endif
+#ifndef ATTITUDE_RATE_FF_YAW
+    #define ATTITUDE_RATE_FF_YAW 0.0f
 #endif
 #ifndef YAW_MAX_DELTA
     #define YAW_MAX_DELTA     0.0f

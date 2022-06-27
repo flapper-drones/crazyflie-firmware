@@ -34,13 +34,6 @@
 #include "commander.h"
 #include "platform_defaults.h"
 
-#define ATTITUDE_LPF_CUTOFF_FREQ      15.0f
-#define ATTITUDE_LPF_ENABLE false
-#define ATTITUDE_ROLL_RATE_LPF_CUTOFF_FREQ 12.5f
-#define ATTITUDE_PITCH_RATE_LPF_CUTOFF_FREQ 12.5f
-#define ATTITUDE_YAW_RATE_LPF_CUTOFF_FREQ 3.0f
-#define ATTITUDE_RATE_LPF_ENABLE true
-#define ATTITUDE_RATE_FF_YAW 220.0f
 
 bool attFiltEnable = ATTITUDE_LPF_ENABLE;
 bool rateFiltEnable = ATTITUDE_RATE_LPF_ENABLE;
@@ -349,6 +342,14 @@ PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, yawFeedForw, &yawFeedForw)
  * @brief If nonzero, yaw setpoint can only be set within +/- yawMaxDelta from the current yaw
  */
 PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, yawMaxDelta, &yawMaxDelta)
+/**
+ * @brief Low pass filter enable
+ */
+PARAM_ADD(PARAM_INT8 | PARAM_PERSISTENT, attFiltEn, &attFiltEnable)
+/**
+ * @brief Low pass filter cut-off frequency (Hz)
+ */
+PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, attFiltCut, &attFiltCutoff)
 PARAM_GROUP_STOP(pid_attitude)
 
 /**
@@ -392,13 +393,20 @@ PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, yaw_ki, &pidYawRate.ki)
  * @brief Derivative gain for the PID yaw rate controller
  */
 PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, yaw_kd, &pidYawRate.kd)
+/**
+ * @brief Low pass filter enable
+ */
+PARAM_ADD(PARAM_INT8 | PARAM_PERSISTENT, rateFiltEn, &rateFiltEnable)
+/**
+ * @brief Low pass filter cut-off frequency, roll axis (Hz)
+ */
+PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, omxFiltCut, &omxFiltCutoff)
+/**
+ * @brief Low pass filter cut-off frequency, pitch axis (Hz)
+ */
+PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, omyFiltCut, &omyFiltCutoff)
+/**
+ * @brief Low pass filter cut-off frequency, yaw axis (Hz)
+ */
+PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, omzFiltCut, &omzFiltCutoff)
 PARAM_GROUP_STOP(pid_rate)
-
-PARAM_GROUP_START(attFilt)
-PARAM_ADD(PARAM_INT8, attFiltEn, &attFiltEnable)
-PARAM_ADD(PARAM_FLOAT, attFiltCut, &attFiltCutoff)
-PARAM_ADD(PARAM_INT8, rateFiltEn, &rateFiltEnable)
-PARAM_ADD(PARAM_FLOAT, omxFiltCut, &omxFiltCutoff)
-PARAM_ADD(PARAM_FLOAT, omyFiltCut, &omyFiltCutoff)
-PARAM_ADD(PARAM_FLOAT, omzFiltCut, &omzFiltCutoff)
-PARAM_GROUP_STOP(attFilt)

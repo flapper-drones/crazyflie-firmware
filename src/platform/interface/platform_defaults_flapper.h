@@ -73,7 +73,14 @@
 #define PID_YAW_KD  1.0
 #define PID_YAW_INTEGRATION_LIMIT     360.0
 
-// IMU orientation
+// Attitude & rate PID low pass filters
+#define ATTITUDE_ROLL_RATE_LPF_CUTOFF_FREQ 12.5f
+#define ATTITUDE_PITCH_RATE_LPF_CUTOFF_FREQ 12.5f
+#define ATTITUDE_YAW_RATE_LPF_CUTOFF_FREQ 3.0f
+#define ATTITUDE_RATE_LPF_ENABLE true
+#define ATTITUDE_RATE_FF_YAW 220.0f
+
+// IMU alignment
 //////////////////////////////////
 #if CONFIG_POWER_DISTRIBUTION_FLAPPER_REVB
     #define IMU_PHI                   0.0f
@@ -84,6 +91,8 @@
     #define IMU_THETA                -90.0f
     #define IMU_PSI                   180.0f
 #endif
+
+
 
 // Disable tumble check //
 //////////////////////////
