@@ -140,25 +140,26 @@ void powerDistribution(motors_thrust_t* motorPower, const control_t *control)
     motorPower->m3 = limitThrust(flapperConfig.yawServoNeutral*act_max/100.0f - control->yaw); // yaw servo
     motorPower->m1 = limitThrust( 0.5f * control->roll + thrust * (1.0f + flapperConfig.rollBias/100.0f) ); // left motor
     motorPower->m4 = limitThrust(-0.5f * control->roll + thrust * (1.0f - flapperConfig.rollBias/100.0f) ); // right motor
+    
+    if (motorPower->m1 < idleThrust) {
+      motorPower->m1 = idleThrust;
+    }
+    if (motorPower->m4 < idleThrust) {
+      motorPower->m4 = idleThrust;
+    }
   #else
     motorPower->m1 = limitThrust(flapperConfig.pitchServoNeutral*act_max/100.0f + pitch_ampl*control->pitch); // pitch servo
     motorPower->m3 = limitThrust(flapperConfig.yawServoNeutral*act_max/100.0f - control->yaw); // yaw servo
     motorPower->m2 = limitThrust( 0.5f * control->roll + thrust * (1.0f + flapperConfig.rollBias/100.0f) ); // left motor
     motorPower->m4 = limitThrust(-0.5f * control->roll + thrust * (1.0f - flapperConfig.rollBias/100.0f) ); // right motor
+    
+    if (motorPower->m2 < idleThrust) {
+      motorPower->m2 = idleThrust;
+    }
+    if (motorPower->m4 < idleThrust) {
+      motorPower->m4 = idleThrust;
+    }
   #endif
-
-  if (motorPower->m1 < idleThrust) {
-    motorPower->m1 = idleThrust;
-  }
-  if (motorPower->m2 < idleThrust) {
-    motorPower->m2 = idleThrust;
-  }
-  if (motorPower->m3 < idleThrust) {
-    motorPower->m3 = idleThrust;
-  }
-  if (motorPower->m4 < idleThrust) {
-    motorPower->m4 = idleThrust;
-  }
 }
 
 /**
