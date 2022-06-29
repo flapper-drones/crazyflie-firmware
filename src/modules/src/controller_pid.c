@@ -72,7 +72,7 @@ void controllerPid(control_t *control, setpoint_t *setpoint,
         {
           attitudeDesired.yaw = state->attitude.yaw + yawMaxDelta;
         }
-        else if (delta < yawMaxDelta)
+        else if (delta < -yawMaxDelta)
         {
           attitudeDesired.yaw = state->attitude.yaw - yawMaxDelta;
         }
