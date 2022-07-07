@@ -58,7 +58,7 @@ static platformConfig_t configs[] = {
     .deviceTypeName = "Flapper (Bolt 1.1)",
     .sensorImplementation = SensorImplementation_bmi088_spi_bmp388,
     .physicalLayoutAntennasAreClose = false,
-    .motorMap = motorMapBoltBrushless,
+    .motorMap = motorMapBolt11Brushless,
   }
 #endif
 };
