@@ -34,8 +34,11 @@
 #include "debug.h"
 #include "log.h"
 #include "param.h"
+#include "extrx.h"
 #include "flapperdeck.h"
 #include "pm.h"
+#include "autoconf.h"
+#include "config.h"
 
 static float reading_last = 0.0;
 static float current_last = 0.0;
@@ -55,8 +58,12 @@ void flapperDeckInit(DeckInfo* info)
 
   xTaskCreate(flapperDeckTask, FLAPPERDECK_TASK_NAME, FLAPPERDECK_TASK_STACKSIZE, NULL, FLAPPERDECK_TASK_PRI, NULL);
 
-  #ifdef CONFIG_DECK_FLAPPER_MEASURE_VBAT_ON_PA3
+  #if CONFIG_DECK_FLAPPER_MEASURE_VBAT_ON_PA3
   pmEnableExtBatteryVoltMeasuring(DECK_GPIO_RX2, 11.0f);
+  #endif
+
+  #if CONFIG_DECK_FLAPPER_EXTRX_ENABLE
+  extRxInit();
   #endif
 
   isInit = true;
@@ -89,7 +96,7 @@ void flapperDeckTask(void* arg)
     // simple low pass filter
     current = filter_alpha*current + (1.0f - filter_alpha)*current_last;
 
-    #ifdef MEASURE_VBAT_ON_PA3
+    #ifdef CONFIG_DECK_FLAPPER_MEASURE_VBAT_ON_PA3
     vbat = filter_alpha*vbat + (1.0f - filter_alpha)*pmMeasureExtBatteryVoltage();
     #else
     vbat = pmGetBatteryVoltage();
@@ -103,15 +110,18 @@ static const DeckDriver flapper_deck = {
   .vid = 0xBC,
   .pid = 0x09,
   .name = "bcFlapperDeck",
-#ifdef MEASURE_VBAT_ON_PA3
+
+  #if CONFIG_DECK_FLAPPER_MEASURE_VBAT_ON_PA3 || CONFIG_DECK_FLAPPER_EXTRX_ENABLE
   .usedGpio = DECK_USING_PA2 | DECK_USING_PA3,
-#else
+  #else
   .usedGpio = DECK_USING_PA2,
-#endif
+  #endif
+  #if CONFIG_DECK_FLAPPER_EXTRX_ENABLE
+  .usedPeriph = DECK_USING_TIMER9,
+  #endif
   .init = flapperDeckInit,
   .test = flapperDeckTest,
 };
-
 
 DECK_DRIVER(flapper_deck);
 
@@ -133,7 +143,7 @@ LOG_GROUP_STOP(flapper)
  *
  * Current sensor parameters
  */
-PARAM_GROUP_START(flapperDeck)
+PARAM_GROUP_START(flapper)
 /**
  * @brief Current sensor constant (A/V)
  */
@@ -143,4 +153,4 @@ PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, ampsPerVolt, &ampsPerVolt)
  */
 PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, filtAlpha, &filter_alpha)
 
-PARAM_GROUP_STOP(flapperDeck)
+PARAM_GROUP_STOP(flapper)

@@ -180,7 +180,7 @@ PARAM_GROUP_STOP(powerDist)
  *
  * Flapper Drone configration parameters
  */
-PARAM_GROUP_START(_flapper)
+PARAM_GROUP_START(flapper)
 /**
  * @brief Roll bias <-25%; 25%> (default 0%)
  *
@@ -212,4 +212,4 @@ PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, servYawNeutr, &flapperConfig.yawServoN
  */
 PARAM_ADD(PARAM_UINT16 | PARAM_PERSISTENT, nimbleMaxThrust, &flapperConfig.maxThrust)
 
-PARAM_GROUP_STOP(_flapper)
+PARAM_GROUP_STOP(flapper)
