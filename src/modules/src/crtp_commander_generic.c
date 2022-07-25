@@ -437,7 +437,7 @@ void crtpCommanderGenericDecodeSetpoint(setpoint_t *setpoint, CRTPPacket *pk)
  * directly to the NRF radio, often with a 4-in-1 Multimodule), or for CPPM channels
  * from an external receiver.  
  */
-PARAM_GROUP_START(CPPM)
+PARAM_GROUP_START(cppm)
 
 /**
  * @brief Config of max roll rate at max stick input [DPS] (default: 720)
@@ -460,4 +460,4 @@ PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, angRoll, &s_CppmEmuRollMaxAngleDeg)
  */
 PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, rateYaw, &s_CppmEmuYawMaxRateDps)
 
-PARAM_GROUP_STOP(CPPM)
+PARAM_GROUP_STOP(cppm)
