@@ -21,10 +21,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * currentdeck.c: Current sensor driver
+ * flapperdeck.c: Flapper PCB driver
  */
 
-#define DEBUG_MODULE "CURRENT"
+#define DEBUG_MODULE "FLAPPER"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -34,7 +34,7 @@
 #include "debug.h"
 #include "log.h"
 #include "param.h"
-#include "currentdeck.h"
+#include "flapperdeck.h"
 #include "pm.h"
 
 static float reading_last = 0.0;
@@ -48,21 +48,21 @@ static float filter_alpha = 0.975;
 
 static bool isInit;
 
-void currentDeckInit(DeckInfo* info)
+void flapperDeckInit(DeckInfo* info)
 {
   if (isInit)
     return;
 
-  xTaskCreate(currentDeckTask, CURRENTDECK_TASK_NAME, CURRENTDECK_TASK_STACKSIZE, NULL, CURRENTDECK_TASK_PRI, NULL);
+  xTaskCreate(flapperDeckTask, FLAPPERDECK_TASK_NAME, FLAPPERDECK_TASK_STACKSIZE, NULL, FLAPPERDECK_TASK_PRI, NULL);
 
-  #ifdef CONFIG_DECK_CURRENT_MEASURE_VBAT_ON_PA3
+  #ifdef CONFIG_DECK_FLAPPER_MEASURE_VBAT_ON_PA3
   pmEnableExtBatteryVoltMeasuring(DECK_GPIO_RX2, 11.0f);
   #endif
 
   isInit = true;
 }
 
-bool currentDeckTest(void)
+bool flapperDeckTest(void)
 {
   bool testStatus;
   testStatus = true;
@@ -73,7 +73,7 @@ bool currentDeckTest(void)
   return testStatus;
 }
 
-void currentDeckTask(void* arg)
+void flapperDeckTask(void* arg)
 {
   systemWaitStart();
   TickType_t xLastWakeTime;
@@ -99,41 +99,41 @@ void currentDeckTask(void* arg)
   }
 }
 
-static const DeckDriver current_deck = {
+static const DeckDriver flapper_deck = {
   .vid = 0xBC,
   .pid = 0x09,
-  .name = "bcCurrentDeck",
+  .name = "bcFlapperDeck",
 #ifdef MEASURE_VBAT_ON_PA3
   .usedGpio = DECK_USING_PA2 | DECK_USING_PA3,
 #else
   .usedGpio = DECK_USING_PA2,
 #endif
-  .init = currentDeckInit,
-  .test = currentDeckTest,
+  .init = flapperDeckInit,
+  .test = flapperDeckTest,
 };
 
 
-DECK_DRIVER(current_deck);
+DECK_DRIVER(flapper_deck);
 
 
 
 PARAM_GROUP_START(deck)
 
-PARAM_ADD_CORE(PARAM_UINT8 | PARAM_RONLY, bcCurrentDeck, &isInit)
+PARAM_ADD_CORE(PARAM_UINT8 | PARAM_RONLY, bcFlapperDeck, &isInit)
 PARAM_GROUP_STOP(deck)
 
-LOG_GROUP_START(current)
+LOG_GROUP_START(flapper)
 LOG_ADD(LOG_FLOAT, vbat, &vbat)
 LOG_ADD(LOG_FLOAT, i_raw, &current_last)
 LOG_ADD(LOG_FLOAT, current, &current)
 LOG_ADD(LOG_FLOAT, power, &power)
-LOG_GROUP_STOP(current)
+LOG_GROUP_STOP(flapper)
 
 /**
  *
  * Current sensor parameters
  */
-PARAM_GROUP_START(current)
+PARAM_GROUP_START(flapperDeck)
 /**
  * @brief Current sensor constant (A/V)
  */
@@ -143,4 +143,4 @@ PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, ampsPerVolt, &ampsPerVolt)
  */
 PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, filtAlpha, &filter_alpha)
 
-PARAM_GROUP_STOP(current)
+PARAM_GROUP_STOP(flapperDeck)

@@ -21,17 +21,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * currentdeck.h: Current-deck driver
+ * flapperdeck.h: Flapper PCB driver
  */
 
-#ifndef _CURRENTDECK_H_
-#define _CURRENTDECK_H_
+#ifndef _FLAPPERDECK_H_
+#define _FLAPPERDECK_H_
 
 #include "deck_core.h"
 
-void currentDeckInit(DeckInfo* info);
+void flapperDeckInit(DeckInfo* info);
 
-bool currentDeckTest(void);
-void currentDeckTask(void* arg);
+bool flapperDeckTest(void);
+void flapperDeckTask(void* arg);
 
-#endif /* _CURRENTDECK_H_ */
+#endif /* _FLAPPERDECK_H_ */
