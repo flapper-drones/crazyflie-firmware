@@ -33,6 +33,7 @@
 #include "pm.h"
 #include "stabilizer.h"
 #include "supervisor.h"
+#include "platform_defaults.h"
 
 /* Minimum summed motor PWM that means we are flying */
 #define SUPERVISOR_FLIGHT_THRESHOLD 1000
