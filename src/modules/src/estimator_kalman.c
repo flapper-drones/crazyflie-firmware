@@ -180,7 +180,7 @@ static void kalmanTask(void* parameters);
 static bool predictStateForward(uint32_t osTick, float dt);
 static bool updateQueuedMeasurements(const uint32_t tick);
 
-STATIC_MEM_TASK_ALLOC_STACK_NO_DMA_CCM_SAFE(kalmanTask, 3 * configMINIMAL_STACK_SIZE);
+STATIC_MEM_TASK_ALLOC_STACK_NO_DMA_CCM_SAFE(kalmanTask, KALMAN_TASK_STACKSIZE);
 
 // --------------------------------------------------
 
@@ -216,7 +216,7 @@ static void kalmanTask(void* parameters) {
     // If the client triggers an estimator reset via parameter update
     if (resetEstimation) {
       estimatorKalmanInit();
-      paramSetInt(paramGetVarId("kalman", "resetEstimation"), 0);
+      resetEstimation = false;
     }
 
     // Tracks whether an update to the state has been made, and the state therefore requires finalization
