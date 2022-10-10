@@ -68,7 +68,7 @@ static setpoint_t setpoint;
 static sensorData_t sensorData;
 static state_t state;
 static control_t control;
-static motors_thrust_t motorPower;
+static uint16_t *motorPower;
 // For scratch storage - never logged or passed to other subsystems.
 static setpoint_t tempSetpoint;
 
@@ -220,6 +220,7 @@ static void stabilizerTask(void* param)
 {
   uint32_t tick;
   uint32_t lastWakeTime;
+  
   vTaskSetApplicationTaskTag(0, (void*)TASK_STABILIZER_ID_NBR);
 
   //Wait for the system to be fully started to start stabilization loop
@@ -285,11 +286,11 @@ static void stabilizerTask(void* param)
       if (emergencyStop || (systemIsArmed() == false)) {
         motorsStop();
       } else {
-        powerDistribution(&motorPower, &control);
-        motorsSetRatio(MOTOR_M1, motorPower.m1);
-        motorsSetRatio(MOTOR_M2, motorPower.m2);
-        motorsSetRatio(MOTOR_M3, motorPower.m3);
-        motorsSetRatio(MOTOR_M4, motorPower.m4);
+        motorPower = powerDistribution(&control);
+        for (int m = 0; m < NBR_OF_MOTORS; m++)
+        {
+          motorsSetRatio(m, motorPower[m]);
+        }
       }
 
 #ifdef CONFIG_DECK_USD

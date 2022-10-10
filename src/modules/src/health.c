@@ -45,7 +45,7 @@
 #include "sensors.h"
 #include "pm.h"
 #include "autoconf.h"
-
+#include "platform_defaults.h"
 #include "static_mem.h"
 
 #define PROPTEST_NBR_OF_VARIANCE_VALUES   100
@@ -152,10 +152,10 @@ void healthRunTests(sensorData_t *sensors)
     sensorsSetAccMode(ACC_MODE_PROPTEST);
     testState = measureNoiseFloor;
     minLoadedVoltage = idleVoltage = pmGetBatteryVoltage();
-    minSingleLoadedVoltage[MOTOR_M1] = minLoadedVoltage;
-    minSingleLoadedVoltage[MOTOR_M2] = minLoadedVoltage;
-    minSingleLoadedVoltage[MOTOR_M3] = minLoadedVoltage;
-    minSingleLoadedVoltage[MOTOR_M4] = minLoadedVoltage;
+    for (int m = 0; m < NBR_OF_MOTORS; m++)
+    {
+      minSingleLoadedVoltage[m] = minLoadedVoltage;
+    }
     // Make sure motors are stopped first.
     motorsStop();
   }
@@ -236,10 +236,10 @@ void healthRunTests(sensorData_t *sensors)
     }
     if (i == 1)
     {
-      motorsSetRatio(MOTOR_M1, 0xFFFF);
-      motorsSetRatio(MOTOR_M2, 0xFFFF);
-      motorsSetRatio(MOTOR_M3, 0xFFFF);
-      motorsSetRatio(MOTOR_M4, 0xFFFF);
+      for (int m = 0; m < NBR_OF_MOTORS; m++)
+      {
+        motorsSetRatio(m, 0xFFFF);
+      }
     }
     else if (i < 50)
     {

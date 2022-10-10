@@ -31,7 +31,7 @@
 
 void powerDistributionInit(void);
 bool powerDistributionTest(void);
-void powerDistribution(motors_thrust_t* motorPower, const control_t *control);
+uint16_t * powerDistribution(const control_t *control);
 
 #ifdef CONFIG_POWER_DISTRIBUTION_FLAPPER
 int8_t flapperConfigRollBias(void);

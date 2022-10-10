@@ -43,6 +43,19 @@
 #  define DEFAULT_IDLE_THRUST CONFIG_MOTORS_DEFAULT_IDLE_THRUST
 #endif
 
+// Motors IDs define
+#ifdef CONFIG_POWER_DISTRIBUTION_FLAPPER_REVB
+  #define MOTOR_LEFT  0
+  #define MOTOR_RIGHT  3
+  #define SERVO_PITCH  1
+  #define SERVO_YAW  2
+#else
+  #define MOTOR_LEFT  1
+  #define MOTOR_RIGHT  3
+  #define SERVO_PITCH  0
+  #define SERVO_YAW  2
+#endif
+
 static uint32_t idleThrust = DEFAULT_IDLE_THRUST;
 
 struct flapperConfig_s {
@@ -108,7 +121,6 @@ int8_t flapperConfigRollBias(void)
 }
 
 void powerDistributionInit(void)
-
 {
   #if CONFIG_POWER_DISTRIBUTION_FLAPPER_REVB
     DEBUG_PRINT("Using Flapper power distribution | PCB revB (2021)\n");
@@ -126,38 +138,27 @@ bool powerDistributionTest(void)
 
 #define limitThrust(VAL) limitUint16(VAL)
 
-void powerDistribution(motors_thrust_t* motorPower, const control_t *control)
+uint16_t * powerDistribution(const control_t *control)
 {
+  static uint16_t motorPower[NBR_OF_MOTORS];
   thrust = fmin(control->thrust, flapperConfig.maxThrust);
   
   flapperConfig.pitchServoNeutral=limitServoNeutral(flapperConfig.pitchServoNeutral);
   flapperConfig.yawServoNeutral=limitServoNeutral(flapperConfig.yawServoNeutral);
 
-  #if CONFIG_POWER_DISTRIBUTION_FLAPPER_REVB
-    motorPower->m2 = limitThrust(flapperConfig.pitchServoNeutral*act_max/100.0f + pitch_ampl*control->pitch); // pitch servo
-    motorPower->m3 = limitThrust(flapperConfig.yawServoNeutral*act_max/100.0f - control->yaw); // yaw servo
-    motorPower->m1 = limitThrust( 0.5f * control->roll + thrust * (1.0f + flapperConfig.rollBias/100.0f) ); // left motor
-    motorPower->m4 = limitThrust(-0.5f * control->roll + thrust * (1.0f - flapperConfig.rollBias/100.0f) ); // right motor
+  motorPower[SERVO_PITCH] = limitThrust(flapperConfig.pitchServoNeutral*act_max/100.0f + pitch_ampl*control->pitch); // pitch servo
+  motorPower[SERVO_YAW] = limitThrust(flapperConfig.yawServoNeutral*act_max/100.0f - control->yaw); // yaw servo
+  motorPower[MOTOR_LEFT] = limitThrust( 0.5f * control->roll + thrust * (1.0f + flapperConfig.rollBias/100.0f) ); // left motor
+  motorPower[MOTOR_RIGHT] = limitThrust(-0.5f * control->roll + thrust * (1.0f - flapperConfig.rollBias/100.0f) ); // right motor
     
-    if (motorPower->m1 < idleThrust) {
-      motorPower->m1 = idleThrust;
-    }
-    if (motorPower->m4 < idleThrust) {
-      motorPower->m4 = idleThrust;
-    }
-  #else
-    motorPower->m1 = limitThrust(flapperConfig.pitchServoNeutral*act_max/100.0f + pitch_ampl*control->pitch); // pitch servo
-    motorPower->m3 = limitThrust(flapperConfig.yawServoNeutral*act_max/100.0f - control->yaw); // yaw servo
-    motorPower->m2 = limitThrust( 0.5f * control->roll + thrust * (1.0f + flapperConfig.rollBias/100.0f) ); // left motor
-    motorPower->m4 = limitThrust(-0.5f * control->roll + thrust * (1.0f - flapperConfig.rollBias/100.0f) ); // right motor
-    
-    if (motorPower->m2 < idleThrust) {
-      motorPower->m2 = idleThrust;
-    }
-    if (motorPower->m4 < idleThrust) {
-      motorPower->m4 = idleThrust;
-    }
-  #endif
+  if (motorPower[MOTOR_LEFT] < idleThrust) {
+    motorPower[MOTOR_LEFT] = idleThrust;
+  }
+  if (motorPower[MOTOR_RIGHT] < idleThrust) {
+    motorPower[MOTOR_RIGHT] = idleThrust;
+  }
+
+  return motorPower;
 }
 
 /**

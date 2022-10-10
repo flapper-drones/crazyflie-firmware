@@ -18,6 +18,7 @@ cffirmware.py
 /tag.*
 /bolt.*
 /flapper.*
+/octo.*
 *.gch
 
 current_platform.mk

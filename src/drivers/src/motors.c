@@ -47,11 +47,11 @@
 #include "param.h"
 
 static bool motorSetEnable = false;
-static uint32_t motorPower[] = {0, 0, 0, 0};    // user-requested PWM signals
-static uint16_t motorPowerSet[] = {0, 0, 0, 0}; // user-requested PWM signals (overrides)
-static uint32_t motor_ratios[] = {0, 0, 0, 0};  // actual PWM signals
-uint32_t motor_ratios_stop[] = {0, 0, 0, 0}; // motor-stop PWM signals
-bool motor_is_servo[] = {0, 0, 0, 0}; // list motors that are servos
+static uint32_t motorPower[NBR_OF_MOTORS] = {0};    // user-requested PWM signals
+static uint16_t motorPowerSet[NBR_OF_MOTORS] = {0}; // user-requested PWM signals (overrides)
+static uint32_t motor_ratios[NBR_OF_MOTORS] = {0};  // actual PWM signals
+uint32_t motor_ratios_stop[NBR_OF_MOTORS] = {0}; // motor-stop PWM signals
+bool motor_is_servo[NBR_OF_MOTORS] = {0}; // list motors that are servos
 
 #ifdef CONFIG_MOTORS_ESC_PROTOCOL_DSHOT
 static DMA_InitTypeDef DMA_InitStructureShare;
@@ -69,9 +69,7 @@ void motorsBeep(int id, bool enable, uint16_t frequency, uint16_t ratio);
 
 const MotorPerifDef** motorMap;  /* Current map configuration */
 
-const uint32_t MOTORS[] = { MOTOR_M1, MOTOR_M2, MOTOR_M3, MOTOR_M4 };
-
-const uint16_t testsound[NBR_OF_MOTORS] = {A4, A5, F5, D5 };
+const uint16_t testsound[] = {A4, A5, F5, D5 };
 
 const MotorHealthTestDef brushedMotorHealthTestSettings = {
   /* onPeriodMsec = */ 50,
@@ -318,19 +316,20 @@ bool motorsTest(void)
 {
   int i;
 
-  for (i = 0; i < sizeof(MOTORS) / sizeof(*MOTORS); i++)
+  for (i = 0; i < sizeof(testsound)/sizeof(*testsound); i++)
   {
+    if (i >= NBR_OF_MOTORS) break;
     if (motorMap[i]->drvType == BRUSHED)
     {
 #ifdef ACTIVATE_STARTUP_SOUND
-      motorsBeep(MOTORS[i], true, testsound[i], (uint16_t)(MOTORS_TIM_BEEP_CLK_FREQ / A4)/ 20);
+      motorsBeep(i, true, testsound[i], (uint16_t)(MOTORS_TIM_BEEP_CLK_FREQ / A4)/ 20);
       vTaskDelay(M2T(MOTORS_TEST_ON_TIME_MS));
-      motorsBeep(MOTORS[i], false, 0, 0);
+      motorsBeep(i, false, 0, 0);
       vTaskDelay(M2T(MOTORS_TEST_DELAY_TIME_MS));
 #else
-      motorsSetRatio(MOTORS[i], MOTORS_TEST_RATIO);
+      motorsSetRatio(i, MOTORS_TEST_RATIO);
       vTaskDelay(M2T(MOTORS_TEST_ON_TIME_MS));
-      motorsSetRatio(MOTORS[i], 0);
+      motorsSetRatio(i, 0);
       vTaskDelay(M2T(MOTORS_TEST_DELAY_TIME_MS));
 #endif
     }
@@ -341,10 +340,11 @@ bool motorsTest(void)
 
 void motorsStop()
 {
-  motorsSetRatio(MOTOR_M1, motor_ratios_stop[0]);
-  motorsSetRatio(MOTOR_M2, motor_ratios_stop[1]);
-  motorsSetRatio(MOTOR_M3, motor_ratios_stop[2]);
-  motorsSetRatio(MOTOR_M4, motor_ratios_stop[3]);
+  int i;
+  for (i = 0; i < NBR_OF_MOTORS; i++)
+  {
+    motorsSetRatio(i, motor_ratios_stop[i]);
+  }
 
 #ifdef CONFIG_MOTORS_ESC_PROTOCOL_DSHOT
   motorsBurstDshot();
@@ -505,7 +505,7 @@ void motorsSetRatio(uint32_t id, uint16_t ithrust)
       motorMap[id]->setCompare(motorMap[id]->tim, motorsConv16ToBits(ratio));
     }
 
-    if (id == MOTOR_M1)
+    if (id == 0)
     {
       uint64_t currTime = usecTimestamp();
       cycleTime = currTime - lastCycleTime;
@@ -623,15 +623,15 @@ void motorsBeep(int id, bool enable, uint16_t frequency, uint16_t ratio)
 // Play a tone with a given frequency and a specific duration in milliseconds (ms)
 void motorsPlayTone(uint16_t frequency, uint16_t duration_msec)
 {
-  motorsBeep(MOTOR_M1, true, frequency, (uint16_t)(MOTORS_TIM_BEEP_CLK_FREQ / frequency)/ 20);
-  motorsBeep(MOTOR_M2, true, frequency, (uint16_t)(MOTORS_TIM_BEEP_CLK_FREQ / frequency)/ 20);
-  motorsBeep(MOTOR_M3, true, frequency, (uint16_t)(MOTORS_TIM_BEEP_CLK_FREQ / frequency)/ 20);
-  motorsBeep(MOTOR_M4, true, frequency, (uint16_t)(MOTORS_TIM_BEEP_CLK_FREQ / frequency)/ 20);
+  motorsBeep(0, true, frequency, (uint16_t)(MOTORS_TIM_BEEP_CLK_FREQ / frequency)/ 20);
+  motorsBeep(1, true, frequency, (uint16_t)(MOTORS_TIM_BEEP_CLK_FREQ / frequency)/ 20);
+  motorsBeep(2, true, frequency, (uint16_t)(MOTORS_TIM_BEEP_CLK_FREQ / frequency)/ 20);
+  motorsBeep(3, true, frequency, (uint16_t)(MOTORS_TIM_BEEP_CLK_FREQ / frequency)/ 20);
   vTaskDelay(M2T(duration_msec));
-  motorsBeep(MOTOR_M1, false, frequency, 0);
-  motorsBeep(MOTOR_M2, false, frequency, 0);
-  motorsBeep(MOTOR_M3, false, frequency, 0);
-  motorsBeep(MOTOR_M4, false, frequency, 0);
+  motorsBeep(0, false, frequency, 0);
+  motorsBeep(1, false, frequency, 0);
+  motorsBeep(2, false, frequency, 0);
+  motorsBeep(3, false, frequency, 0);
 }
 
 // Plays a melody from a note array
@@ -731,6 +731,34 @@ PARAM_ADD_CORE(PARAM_UINT16, m3, &motorPowerSet[2])
  */
 PARAM_ADD_CORE(PARAM_UINT16, m4, &motorPowerSet[3])
 
+#if (NBR_OF_MOTORS > 4)
+/**
+ * @brief motor power for m5: `0 - UINT16_MAX`
+ */
+PARAM_ADD_CORE(PARAM_UINT16, m5, &motorPowerSet[4])
+#endif
+
+#if (NBR_OF_MOTORS > 5)
+/**
+ * @brief motor power for m6: `0 - UINT16_MAX`
+ */
+PARAM_ADD_CORE(PARAM_UINT16, m6, &motorPowerSet[5])
+#endif
+
+#if (NBR_OF_MOTORS > 6)
+/**
+ * @brief motor power for m7: `0 - UINT16_MAX`
+ */
+PARAM_ADD_CORE(PARAM_UINT16, m7, &motorPowerSet[6])
+#endif
+
+#if (NBR_OF_MOTORS > 7)
+/**
+ * @brief motor power for m8: `0 - UINT16_MAX`
+ */
+PARAM_ADD_CORE(PARAM_UINT16, m8, &motorPowerSet[7])
+#endif
+
 PARAM_GROUP_STOP(motorPowerSet)
 
 /**
@@ -753,6 +781,30 @@ LOG_ADD_CORE(LOG_UINT32, m3, &motorPower[2])
  * @brief Requested motor power (PWM value) for M4 [0 - UINT16_MAX]
  */
 LOG_ADD_CORE(LOG_UINT32, m4, &motorPower[3])
+#if (NBR_OF_MOTORS > 4)
+/**
+ * @brief Requested motor power (PWM value) for M5 [0 - UINT16_MAX]
+ */
+LOG_ADD_CORE(LOG_UINT32, m5, &motorPower[4])
+#endif
+#if (NBR_OF_MOTORS > 5)
+/**
+ * @brief Requested motor power (PWM value) for M6 [0 - UINT16_MAX]
+ */
+LOG_ADD_CORE(LOG_UINT32, m6, &motorPower[5])
+#endif
+#if (NBR_OF_MOTORS > 6)
+/**
+ * @brief Requested motor power (PWM value) for M7 [0 - UINT16_MAX]
+ */
+LOG_ADD_CORE(LOG_UINT32, m7, &motorPower[6])
+#endif
+#if (NBR_OF_MOTORS > 7)
+/**
+ * @brief Requested motor power (PWM value) for M8 [0 - UINT16_MAX]
+ */
+LOG_ADD_CORE(LOG_UINT32, m8, &motorPower[7])
+#endif
 LOG_GROUP_STOP(motor)
 
 
@@ -776,6 +828,30 @@ LOG_ADD(LOG_UINT32, m3_pwm, &motor_ratios[2])
  * @brief Current motor 4 PWM output
  */
 LOG_ADD(LOG_UINT32, m4_pwm, &motor_ratios[3])
+#if (NBR_OF_MOTORS > 4)
+/**
+ * @brief Current motor 5 PWM output
+ */
+LOG_ADD(LOG_UINT32, m5_pwm, &motor_ratios[4])
+#endif
+#if (NBR_OF_MOTORS > 5)
+/**
+ * @brief Current motor 6 PWM output
+ */
+LOG_ADD(LOG_UINT32, m6_pwm, &motor_ratios[5])
+#endif
+#if (NBR_OF_MOTORS > 6)
+/**
+ * @brief Current motor 7 PWM output
+ */
+LOG_ADD(LOG_UINT32, m7_pwm, &motor_ratios[6])
+#endif
+#if (NBR_OF_MOTORS > 7)
+/**
+ * @brief Current motor 8 PWM output
+ */
+LOG_ADD(LOG_UINT32, m8_pwm, &motor_ratios[7])
+#endif
 /**
  * @brief Cycle time of M1 output in microseconds
  */

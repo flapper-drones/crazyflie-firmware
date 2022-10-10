@@ -106,6 +106,10 @@ ifeq ($(CONFIG_PLATFORM_FLAPPER),y)
 PLATFORM = flapper
 endif
 
+ifeq ($(CONFIG_PLATFORM_OCTO),y)
+PLATFORM = octo
+endif
+
 
 PLATFORM  ?= cf2
 PROG ?= $(PLATFORM)

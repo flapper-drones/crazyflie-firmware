@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * power_distribution_quadrotor.c - Crazyflie stock power distribution code
+ * power_distribution_coaxial_octorotor.c - Coaxial octorotor power distribution code
  */
 
 #include "power_distribution.h"
@@ -46,6 +46,10 @@
 #define MOTOR_M2  1
 #define MOTOR_M3  2
 #define MOTOR_M4  3
+#define MOTOR_M5  4
+#define MOTOR_M6  5
+#define MOTOR_M7  6
+#define MOTOR_M8  7
 
 static uint32_t idleThrust = DEFAULT_IDLE_THRUST;
 
@@ -70,6 +74,10 @@ uint16_t * powerDistribution(const control_t *control)
   motorPower[MOTOR_M2] = limitThrust(control->thrust - r - p - control->yaw);
   motorPower[MOTOR_M3] =  limitThrust(control->thrust + r - p + control->yaw);
   motorPower[MOTOR_M4] =  limitThrust(control->thrust + r + p - control->yaw);
+  motorPower[MOTOR_M5] = limitThrust(control->thrust - r + p - control->yaw);
+  motorPower[MOTOR_M6] = limitThrust(control->thrust - r - p + control->yaw);
+  motorPower[MOTOR_M7] =  limitThrust(control->thrust + r - p - control->yaw);
+  motorPower[MOTOR_M8] =  limitThrust(control->thrust + r + p + control->yaw);
 
   for (int i = 0; i < NBR_OF_MOTORS; i++)
     {

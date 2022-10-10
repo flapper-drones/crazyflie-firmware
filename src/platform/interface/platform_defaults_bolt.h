@@ -33,6 +33,9 @@
 
 // Defines for default values in the bolt platform
 
+// Number of motors
+#define NBR_OF_MOTORS 4
+
 // Default values for battery limits
 #define DEFAULT_BAT_LOW_VOLTAGE                   6.4f
 #define DEFAULT_BAT_CRITICAL_LOW_VOLTAGE          6.0f

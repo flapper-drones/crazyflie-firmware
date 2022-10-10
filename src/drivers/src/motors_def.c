@@ -693,7 +693,7 @@ static const MotorPerifDef MOTORS_PA7_TIM14_CH1_BRUSHLESS_OD =
  * Mapping for Tags that don't have motors.
  * Actually same mapping as for CF2 but the pins are not physically connected.
  */
-const MotorPerifDef* motorMapNoMotors[NBR_OF_MOTORS] =
+const MotorPerifDef* motorMapNoMotors[4] =
 {
   &MOTORS_PA1_TIM2_CH2_BRUSHED,
   &MOTORS_PB11_TIM2_CH4_BRUSHED,
@@ -704,7 +704,7 @@ const MotorPerifDef* motorMapNoMotors[NBR_OF_MOTORS] =
 /**
  * Default brushed mapping to M1-M4 connectors.
  */
-const MotorPerifDef* motorMapDefaultBrushed[NBR_OF_MOTORS] =
+const MotorPerifDef* motorMapDefaultBrushed[4] =
 {
   &MOTORS_PA1_TIM2_CH2_BRUSHED,
   &MOTORS_PB11_TIM2_CH4_BRUSHED,
@@ -719,7 +719,7 @@ const MotorPerifDef* motorMapDefaultBrushed[NBR_OF_MOTORS] =
  * M3 -> IO2
  * M4 -> RX2
  */
-const MotorPerifDef* motorMapBigQuadDeck[NBR_OF_MOTORS] =
+const MotorPerifDef* motorMapBigQuadDeck[4] =
 {
   &MOTORS_PA2_TIM2_CH3_BRUSHLESS_OD,
   &MOTORS_PB4_TIM2_CH1_BRUSHLESS_OD,
@@ -730,7 +730,7 @@ const MotorPerifDef* motorMapBigQuadDeck[NBR_OF_MOTORS] =
 /**
  * Brushless motors mapped to the standard motor connectors with pull-ups (~1K) to VBAT soldered.
  */
-const MotorPerifDef* motorMapDefaltConBrushless[NBR_OF_MOTORS] =
+const MotorPerifDef* motorMapDefaltConBrushless[4] =
 {
   &MOTORS_PA1_TIM2_CH2_BRUSHLESS_INV_PP,
   &MOTORS_PB11_TIM2_CH4_BRUSHLESS_INV_PP,
@@ -741,7 +741,7 @@ const MotorPerifDef* motorMapDefaltConBrushless[NBR_OF_MOTORS] =
 /**
  * Brushless motors mapped to the Bolt PWM outputs.
  */
-const MotorPerifDef* motorMapBoltBrushless[NBR_OF_MOTORS] =
+const MotorPerifDef* motorMapBoltBrushless[4] =
 {
   &MOTORS_PA1_TIM2_CH2_BRUSHLESS_PP,
   &MOTORS_PB11_TIM2_CH4_BRUSHLESS_PP,
@@ -752,7 +752,7 @@ const MotorPerifDef* motorMapBoltBrushless[NBR_OF_MOTORS] =
 /**
  * Brushless motors mapped to the Bolt 1.1 PWM outputs.
  */
-const MotorPerifDef* motorMapBolt11Brushless[NBR_OF_MOTORS] =
+const MotorPerifDef* motorMapBolt11Brushless[4] =
 {
   &MOTORS_PA1_TIM2_CH2_BRUSHLESS_PP,
   &MOTORS_PB11_TIM2_CH4_BRUSHLESS_PP,
@@ -763,7 +763,7 @@ const MotorPerifDef* motorMapBolt11Brushless[NBR_OF_MOTORS] =
 /**
  * Brushless motors mapped to the Bolt Rev.F PWM outputs.
  */
-const MotorPerifDef* motorMapCF21Brushless[NBR_OF_MOTORS] =
+const MotorPerifDef* motorMapCF21Brushless[4] =
 {
     &MOTORS_PA1_TIM2_CH2_BRUSHLESS_OD,
     &MOTORS_PB11_TIM2_CH4_BRUSHLESS_OD,
@@ -771,3 +771,40 @@ const MotorPerifDef* motorMapCF21Brushless[NBR_OF_MOTORS] =
     &MOTORS_PB10_TIM2_CH3_BRUSHLESS_OD
 };
 
+/**
+ * Brushless motors mapped as on Bolt AND the Big-Quad deck
+ * M1 -> TX2
+ * M2 -> IO3
+ * M3 -> IO2
+ * M4 -> RX2
+ */
+const MotorPerifDef* motorMapOctoBolt[8] =
+{
+    &MOTORS_PA1_TIM2_CH2_BRUSHLESS_PP,
+    &MOTORS_PB11_TIM2_CH4_BRUSHLESS_PP,
+    &MOTORS_PA15_TIM2_CH1_BRUSHLESS_PP,
+    &MOTORS_PB9_TIM4_CH4_BRUSHLESS_PP,
+    &MOTORS_PA2_TIM2_CH3_BRUSHLESS_OD,
+    &MOTORS_PB4_TIM2_CH1_BRUSHLESS_OD,
+    &MOTORS_PB5_TIM3_CH2_BRUSHLESS_OD,
+    &MOTORS_PA3_TIM2_CH4_BRUSHLESS_OD
+};
+
+/**
+ * Brushless motors mapped as on Bolt 1.1 AND the Big-Quad deck
+ * M1 -> TX2
+ * M2 -> IO3
+ * M3 -> IO2
+ * M4 -> RX2
+ */
+const MotorPerifDef* motorMapOctoBolt11[8] =
+{
+    &MOTORS_PA1_TIM2_CH2_BRUSHLESS_PP,
+    &MOTORS_PB11_TIM2_CH4_BRUSHLESS_PP,
+    &MOTORS_PA15_TIM2_CH1_BRUSHLESS_PP,
+    &MOTORS_PB10_TIM2_CH3_BRUSHLESS_PP,
+    &MOTORS_PA2_TIM2_CH3_BRUSHLESS_OD,
+    &MOTORS_PB4_TIM2_CH1_BRUSHLESS_OD,
+    &MOTORS_PB5_TIM3_CH2_BRUSHLESS_OD,
+    &MOTORS_PA3_TIM2_CH4_BRUSHLESS_OD
+};
