@@ -71,5 +71,5 @@ void platformInitHardware() {
 // Config functions ------------------------
 
 const char* platformConfigGetPlatformName() {
-  return "bolt";
+  return "octo";
 }
