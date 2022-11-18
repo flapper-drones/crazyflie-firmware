@@ -45,6 +45,7 @@
 #include "sensors.h"
 #include "pm.h"
 #include "autoconf.h"
+#include "platform_defaults.h"
 
 #include "static_mem.h"
 
@@ -65,12 +66,12 @@ static float accVarZnf;
 static int motorToTest = 0;
 static uint8_t nrFailedTests = 0;
 static float idleVoltage;
-static float minSingleLoadedVoltage[NBR_OF_MOTORS];
+static float minSingleLoadedVoltage[STABILIZER_NBR_OF_MOTORS];
 static float minLoadedVoltage;
 
-static float accVarX[NBR_OF_MOTORS];
-static float accVarY[NBR_OF_MOTORS];
-static float accVarZ[NBR_OF_MOTORS];
+static float accVarX[STABILIZER_NBR_OF_MOTORS];
+static float accVarY[STABILIZER_NBR_OF_MOTORS];
+static float accVarZ[STABILIZER_NBR_OF_MOTORS];
 // Bit field indicating if the motors passed the motor test.
 // Bit 0 - 1 = M1 passed
 // Bit 1 - 1 = M2 passed
@@ -152,10 +153,10 @@ void healthRunTests(sensorData_t *sensors)
     sensorsSetAccMode(ACC_MODE_PROPTEST);
     testState = measureNoiseFloor;
     minLoadedVoltage = idleVoltage = pmGetBatteryVoltage();
-    minSingleLoadedVoltage[MOTOR_M1] = minLoadedVoltage;
-    minSingleLoadedVoltage[MOTOR_M2] = minLoadedVoltage;
-    minSingleLoadedVoltage[MOTOR_M3] = minLoadedVoltage;
-    minSingleLoadedVoltage[MOTOR_M4] = minLoadedVoltage;
+    for (int m = 0; m < STABILIZER_NBR_OF_MOTORS; m++)
+    {
+      minSingleLoadedVoltage[m] = minLoadedVoltage;
+    }
     // Make sure motors are stopped first.
     motorsStop();
   }
@@ -217,7 +218,7 @@ void healthRunTests(sensorData_t *sensors)
     {
       i = 0;
       motorToTest++;
-      if (motorToTest >= NBR_OF_MOTORS)
+      if (motorToTest >= STABILIZER_NBR_OF_MOTORS)
       {
         i = 0;
         motorToTest = 0;
@@ -236,10 +237,10 @@ void healthRunTests(sensorData_t *sensors)
     }
     if (i == 1)
     {
-      motorsSetRatio(MOTOR_M1, 0xFFFF);
-      motorsSetRatio(MOTOR_M2, 0xFFFF);
-      motorsSetRatio(MOTOR_M3, 0xFFFF);
-      motorsSetRatio(MOTOR_M4, 0xFFFF);
+      for (int m = 0; m < STABILIZER_NBR_OF_MOTORS; m++)
+      {
+        motorsSetRatio(m, 0xFFFF);
+      }
     }
     else if (i < 50)
     {
@@ -284,7 +285,7 @@ void healthRunTests(sensorData_t *sensors)
   }
   else if (testState == evaluatePropResult)
   {
-    for (int m = 0; m < NBR_OF_MOTORS; m++)
+    for (int m = 0; m < STABILIZER_NBR_OF_MOTORS; m++)
     {
       if (!evaluatePropTest(0, PROPELLER_BALANCE_TEST_THRESHOLD,  accVarX[m] + accVarY[m], m))
       {
@@ -301,7 +302,7 @@ void healthRunTests(sensorData_t *sensors)
 #ifdef PLAY_STARTUP_MELODY_ON_MOTORS
     if (nrFailedTests == 0)
     {
-      for (int m = 0; m < NBR_OF_MOTORS; m++)
+      for (int m = 0; m < STABILIZER_NBR_OF_MOTORS; m++)
       {
         motorsBeep(m, true, testsound[m], (uint16_t)(MOTORS_TIM_BEEP_CLK_FREQ / A4)/ 20);
         vTaskDelay(M2T(MOTORS_TEST_ON_TIME_MS));

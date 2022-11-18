@@ -33,6 +33,10 @@
 
 // Defines for default values in the tag platform
 
+// Number of motors
+#define NBR_OF_MOTORS 4
+#define STABILIZER_NBR_OF_MOTORS 4
+
 // Default values for battery limits
 #define DEFAULT_BAT_LOW_VOLTAGE                   3.2f
 #define DEFAULT_BAT_CRITICAL_LOW_VOLTAGE          3.0f

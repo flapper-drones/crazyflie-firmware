@@ -80,7 +80,7 @@ static bool canFlyCheck()
 static bool isFlyingCheck()
 {
   int sumRatio = 0;
-  for (int i = 0; i < NBR_OF_MOTORS; ++i) {
+  for (int i = 0; i < STABILIZER_NBR_OF_MOTORS; ++i) {
     sumRatio += powerDistributionMotorType(i) * motorsGetRatio(i);
   }
 

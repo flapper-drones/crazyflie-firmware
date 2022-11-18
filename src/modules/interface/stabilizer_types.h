@@ -30,6 +30,7 @@
 #include <stdbool.h>
 #include "imu_types.h"
 #include "lighthouse_types.h"
+#include "platform_defaults.h"
 
 /* Data structure used by the stabilizer subsystem.
  * All have a timestamp to be set when the data is calculated.
@@ -167,8 +168,6 @@ typedef struct state_s {
   acc_t acc;                // Gs (but acc.z without considering gravity)
 } state_t;
 
-#define STABILIZER_NR_OF_MOTORS 4
-
 typedef enum control_mode_e {
   controlModeLegacy      = 0, // legacy mode with int16_t roll, pitch, yaw and float thrust
   controlModeForceTorque = 1,
@@ -201,29 +200,37 @@ typedef struct control_s {
     };
 
     // controlModeForce
-    float normalizedForces[STABILIZER_NR_OF_MOTORS]; // 0.0 ... 1.0
+    float normalizedForces[STABILIZER_NBR_OF_MOTORS]; // 0.0 ... 1.0
   };
 
   control_mode_t controlMode;
 } control_t;
 
 typedef union {
-  int32_t list[STABILIZER_NR_OF_MOTORS];
+  int32_t list[STABILIZER_NBR_OF_MOTORS];
   struct {
     int32_t m1;
     int32_t m2;
     int32_t m3;
     int32_t m4;
+    int32_t m5;
+    int32_t m6;
+    int32_t m7;
+    int32_t m8;
   } motors;
 } motors_thrust_uncapped_t;
 
 typedef union {
-  uint16_t list[STABILIZER_NR_OF_MOTORS];
+  uint16_t list[STABILIZER_NBR_OF_MOTORS];
   struct {
     uint16_t m1;  // PWM ratio
     uint16_t m2;  // PWM ratio
     uint16_t m3;  // PWM ratio
     uint16_t m4;  // PWM ratio
+    uint16_t m5;  // PWM ratio
+    uint16_t m6;  // PWM ratio
+    uint16_t m7;  // PWM ratio
+    uint16_t m8;  // PWM ratio
   } motors;
 } motors_thrust_pwm_t;
 

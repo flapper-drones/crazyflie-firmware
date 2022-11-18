@@ -37,6 +37,7 @@
 #include <stdbool.h>
 #include "config.h"
 #include "autoconf.h"
+#include "platform_defaults.h"
 /* ST includes */
 #include "stm32fxxx.h"
 
@@ -136,13 +137,6 @@
   #define MOTORS_BL_PWM_PRESCALE       (uint16_t)(MOTORS_BL_PWM_PRESCALE_RAW - 1)
   #define MOTORS_BL_POLARITY           TIM_OCPolarity_Low
 #endif
-
-#define NBR_OF_MOTORS 4
-// Motors IDs define
-#define MOTOR_M1  0
-#define MOTOR_M2  1
-#define MOTOR_M3  2
-#define MOTOR_M4  3
 
 // Test defines
 #define MOTORS_TEST_RATIO         (uint16_t)(0.2*(1<<16))
@@ -252,18 +246,18 @@ typedef struct {
 /**
  * Motor mapping configurations
  */
-extern const MotorPerifDef* motorMapNoMotors[NBR_OF_MOTORS];
-extern const MotorPerifDef* motorMapDefaultBrushed[NBR_OF_MOTORS];
-extern const MotorPerifDef* motorMapDefaltConBrushless[NBR_OF_MOTORS];
-extern const MotorPerifDef* motorMapBigQuadDeck[NBR_OF_MOTORS];
-extern const MotorPerifDef* motorMapBoltBrushless[NBR_OF_MOTORS];
-extern const MotorPerifDef* motorMapBolt11Brushless[NBR_OF_MOTORS];
-extern const MotorPerifDef* motorMapCF21Brushless[NBR_OF_MOTORS];
+extern const MotorPerifDef* motorMapNoMotors[4];
+extern const MotorPerifDef* motorMapDefaultBrushed[4];
+extern const MotorPerifDef* motorMapDefaltConBrushless[4];
+extern const MotorPerifDef* motorMapBigQuadDeck[4];
+extern const MotorPerifDef* motorMapBoltBrushless[4];
+extern const MotorPerifDef* motorMapBolt11Brushless[4];
+extern const MotorPerifDef* motorMapCF21Brushless[4];
 
 /**
  * Test sound tones
  */
-extern const uint16_t testsound[NBR_OF_MOTORS];
+extern const uint16_t testsound[STABILIZER_NBR_OF_MOTORS];
 /*** Public interface ***/
 
 /**

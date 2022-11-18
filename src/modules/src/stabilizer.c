@@ -219,7 +219,7 @@ static void batteryCompensation(const motors_thrust_uncapped_t* motorThrustUncap
 {
   float supplyVoltage = pmGetBatteryVoltage();
 
-  for (int motor = 0; motor < STABILIZER_NR_OF_MOTORS; motor++)
+  for (int motor = 0; motor < STABILIZER_NBR_OF_MOTORS; motor++)
   {
     motorThrustBatCompUncapped->list[motor] = motorsCompensateBatteryVoltage(motor, motorThrustUncapped->list[motor], supplyVoltage);
   }
@@ -227,10 +227,14 @@ static void batteryCompensation(const motors_thrust_uncapped_t* motorThrustUncap
 
 static void setMotorRatios(const motors_thrust_pwm_t* motorPwm)
 {
-  motorsSetRatio(MOTOR_M1, motorPwm->motors.m1);
-  motorsSetRatio(MOTOR_M2, motorPwm->motors.m2);
-  motorsSetRatio(MOTOR_M3, motorPwm->motors.m3);
-  motorsSetRatio(MOTOR_M4, motorPwm->motors.m4);
+  motorsSetRatio(0, motorPwm->motors.m1);
+  motorsSetRatio(1, motorPwm->motors.m2);
+  motorsSetRatio(2, motorPwm->motors.m3);
+  motorsSetRatio(3, motorPwm->motors.m4);
+  motorsSetRatio(4, motorPwm->motors.m5);
+  motorsSetRatio(5, motorPwm->motors.m6);
+  motorsSetRatio(6, motorPwm->motors.m7);
+  motorsSetRatio(7, motorPwm->motors.m8);
 }
 
 /* The stabilizer loop runs at 1kHz. It is the

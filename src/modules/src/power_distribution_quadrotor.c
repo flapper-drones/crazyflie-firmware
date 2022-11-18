@@ -88,7 +88,7 @@ static void powerDistributionLegacy(const control_t *control, motors_thrust_unca
 }
 
 static void powerDistributionForceTorque(const control_t *control, motors_thrust_uncapped_t* motorThrustUncapped) {
-  static float motorForces[STABILIZER_NR_OF_MOTORS];
+  static float motorForces[STABILIZER_NBR_OF_MOTORS];
 
   const float arm = 0.707106781f * armLength;
   const float rollPart = 0.25f / arm * control->torqueX;
@@ -101,7 +101,7 @@ static void powerDistributionForceTorque(const control_t *control, motors_thrust
   motorForces[2] = thrustPart + rollPart + pitchPart - yawPart;
   motorForces[3] = thrustPart + rollPart - pitchPart + yawPart;
 
-  for (int motorIndex = 0; motorIndex < STABILIZER_NR_OF_MOTORS; motorIndex++) {
+  for (int motorIndex = 0; motorIndex < STABILIZER_NBR_OF_MOTORS; motorIndex++) {
     float motorForce = motorForces[motorIndex];
     if (motorForce < 0.0f) {
       motorForce = 0.0f;
@@ -140,7 +140,7 @@ void powerDistributionCap(const motors_thrust_uncapped_t* motorThrustBatCompUnca
 
   // Find highest thrust
   int32_t highestThrustFound = 0;
-  for (int motorIndex = 0; motorIndex < STABILIZER_NR_OF_MOTORS; motorIndex++)
+  for (int motorIndex = 0; motorIndex < STABILIZER_NBR_OF_MOTORS; motorIndex++)
   {
     const int32_t thrust = motorThrustBatCompUncapped->list[motorIndex];
     if (thrust > highestThrustFound)
@@ -155,7 +155,7 @@ void powerDistributionCap(const motors_thrust_uncapped_t* motorThrustBatCompUnca
     reduction = highestThrustFound - maxAllowedThrust;
   }
 
-  for (int motorIndex = 0; motorIndex < STABILIZER_NR_OF_MOTORS; motorIndex++)
+  for (int motorIndex = 0; motorIndex < STABILIZER_NBR_OF_MOTORS; motorIndex++)
   {
     int32_t thrustCappedUpper = motorThrustBatCompUncapped->list[motorIndex] - reduction;
     motorPwm->list[motorIndex] = capMinThrust(thrustCappedUpper, idleThrust);
