@@ -257,6 +257,8 @@ extern const MotorPerifDef* motorMapBigQuadDeck[4];
 extern const MotorPerifDef* motorMapBoltBrushless[4];
 extern const MotorPerifDef* motorMapBolt11Brushless[4];
 extern const MotorPerifDef* motorMapCF21Brushless[4];
+extern const MotorPerifDef* motorMapFlapperGripBolt[5];
+extern const MotorPerifDef* motorMapFlapperGripBolt11[5];
 extern const MotorPerifDef* motorMapOctoBolt[8];
 extern const MotorPerifDef* motorMapOctoBolt11[8];
 

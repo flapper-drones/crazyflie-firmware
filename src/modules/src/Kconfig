@@ -153,6 +153,11 @@ config POWER_DISTRIBUTION_FLAPPER
     depends on PLATFORM_FLAPPER
     help
         Power distribution function for Flapper Nimble+
+config POWER_DISTRIBUTION_FLAPPERGRIP
+    bool "Flapper Nimble+ with a gripper power distribution"
+    depends on PLATFORM_FLAPPERGRIP
+    help
+        Power distribution function for Flapper Nimble+ with a gripper
 config POWER_DISTRIBUTION_OCTO
     bool "Coaxial Octocopter power distribution"
     depends on PLATFORM_OCTO

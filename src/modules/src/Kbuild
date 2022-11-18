@@ -41,6 +41,7 @@ obj-y += position_controller_pid.o
 obj-y += position_estimator_altitude.o
 obj-$(CONFIG_POWER_DISTRIBUTION_QUADROTOR) += power_distribution_quadrotor.o
 obj-$(CONFIG_POWER_DISTRIBUTION_FLAPPER) += power_distribution_flapper.o
+obj-$(CONFIG_POWER_DISTRIBUTION_FLAPPERGRIP) += power_distribution_flappergrip.o
 obj-$(CONFIG_POWER_DISTRIBUTION_OCTO) += power_distribution_coaxial_octorotor.o
 obj-y += pptraj_compressed.o
 obj-y += pptraj.o

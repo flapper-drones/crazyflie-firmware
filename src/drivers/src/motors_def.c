@@ -808,3 +808,37 @@ const MotorPerifDef* motorMapOctoBolt11[8] =
     &MOTORS_PB5_TIM3_CH2_BRUSHLESS_OD,
     &MOTORS_PA3_TIM2_CH4_BRUSHLESS_OD
 };
+
+/**
+ * Brushless motors mapped as on Bolt AND the Big-Quad deck
+ * M1 -> TX2
+ * M2 -> IO3
+ * M3 -> IO2
+ * M4 -> RX2
+ * M5 -> PB4
+ */
+const MotorPerifDef* motorMapFlapperGripBolt[5] =
+{
+    &MOTORS_PA1_TIM2_CH2_BRUSHLESS_PP,
+    &MOTORS_PB11_TIM2_CH4_BRUSHLESS_PP,
+    &MOTORS_PA15_TIM2_CH1_BRUSHLESS_PP,
+    &MOTORS_PB9_TIM4_CH4_BRUSHLESS_PP,
+    &MOTORS_PB4_TIM2_CH1_BRUSHLESS_OD
+};
+
+/**
+ * Brushless motors mapped as on Bolt 1.1 AND the Big-Quad deck
+ * M1 -> TX2
+ * M2 -> IO3
+ * M3 -> IO2
+ * M4 -> RX2
+ * M5 -> PB4
+ */
+const MotorPerifDef* motorMapFlapperGripBolt11[5] =
+{
+    &MOTORS_PA1_TIM2_CH2_BRUSHLESS_PP,
+    &MOTORS_PB11_TIM2_CH4_BRUSHLESS_PP,
+    &MOTORS_PA15_TIM2_CH1_BRUSHLESS_PP,
+    &MOTORS_PB10_TIM2_CH3_BRUSHLESS_PP,
+    &MOTORS_PB4_TIM2_CH1_BRUSHLESS_OD
+};

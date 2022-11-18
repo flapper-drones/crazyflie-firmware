@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * power_distribution_flapper.c - Power distribution code for the Flapper Nimble+
+ * power_distribution_flappergrip.c - Power distribution code for the Flapper Nimble+ with a gripper
  */
 #define DEBUG_MODULE "PWR_DIST"
 
@@ -49,11 +49,13 @@
   #define MOTOR_RIGHT  3
   #define SERVO_PITCH  1
   #define SERVO_YAW  2
+  #define SERVO_GRIPPER 4
 #else
   #define MOTOR_LEFT  1
   #define MOTOR_RIGHT  3
   #define SERVO_PITCH  0
   #define SERVO_YAW  2
+  #define SERVO_GRIPPER 4
 #endif
 
 static uint32_t idleThrust = DEFAULT_IDLE_THRUST;
@@ -61,6 +63,7 @@ static uint32_t idleThrust = DEFAULT_IDLE_THRUST;
 struct flapperConfig_s {
   uint8_t pitchServoNeutral;
   uint8_t yawServoNeutral;
+  uint8_t gripServoNeutral;
   int8_t rollBias;
   uint16_t maxThrust;
 };
@@ -68,6 +71,7 @@ struct flapperConfig_s {
 struct flapperConfig_s flapperConfig = {
   .pitchServoNeutral = 50,
   .yawServoNeutral = 50,
+  .gripServoNeutral = 50,
   .rollBias = 0,
   .maxThrust = 60000,
 };
@@ -115,6 +119,11 @@ uint8_t flapperConfigYawNeutral(void)
   return limitServoNeutral(flapperConfig.yawServoNeutral);
 }
 
+uint8_t flapperConfigGripNeutral(void)
+{
+  return limitServoNeutral(flapperConfig.gripServoNeutral);
+}
+
 int8_t flapperConfigRollBias(void)
 {
   return limitServoNeutral(flapperConfig.rollBias);
@@ -150,6 +159,7 @@ uint16_t * powerDistribution(const control_t *control)
   motorPower[SERVO_YAW] = limitThrust(flapperConfig.yawServoNeutral*act_max/100.0f - control->yaw); // yaw servo
   motorPower[MOTOR_LEFT] = limitThrust( 0.5f * control->roll + thrust * (1.0f + flapperConfig.rollBias/100.0f) ); // left motor
   motorPower[MOTOR_RIGHT] = limitThrust(-0.5f * control->roll + thrust * (1.0f - flapperConfig.rollBias/100.0f) ); // right motor
+  motorPower[SERVO_GRIPPER] = limitThrust(flapperConfig.gripServoNeutral*act_max/100.0f ); // gripper servo
     
   if (motorPower[MOTOR_LEFT] < idleThrust) {
     motorPower[MOTOR_LEFT] = idleThrust;
@@ -204,10 +214,16 @@ PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, servPitchNeutr, &flapperConfig.pitchSe
  */
 PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, servYawNeutr, &flapperConfig.yawServoNeutral)
 /**
- * @brief Yaw servo neutral <25%; 75%> (default 50%)
+ * @brief Grip servo neutral <25%; 75%> (default 50%)
  *
  * The parameter sets the neutral position of the yaw servo, such that the yaw control arm is pointed spanwise. If in flight 
  * you observe drift in the clock-wise direction, increase this parameter and vice-versa if the drift is counter-clock-wise.
+ */
+PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, servGripNeutr, &flapperConfig.gripServoNeutral)
+/**
+ * @brief Max Thrust <0; 65535> (default 60000)
+ *
+ * The parameter sets the max thrust limit
  */
 PARAM_ADD(PARAM_UINT16 | PARAM_PERSISTENT, flapperMaxThrust, &flapperConfig.maxThrust)
 

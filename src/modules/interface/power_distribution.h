@@ -37,6 +37,7 @@ uint16_t * powerDistribution(const control_t *control);
 int8_t flapperConfigRollBias(void);
 uint8_t flapperConfigPitchNeutral(void);
 uint8_t flapperConfigYawNeutral(void);
+uint8_t flapperConfigGripNeutral(void);
 #endif
 
 #endif //__POWER_DISTRIBUTION_H__
