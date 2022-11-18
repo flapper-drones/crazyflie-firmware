@@ -36,6 +36,8 @@
 #include "platform_defaults.h"
 #include "debug.h"
 #include "math.h"
+#include "extrx.h"
+#include "crtp_commander.h"
 
 #ifndef CONFIG_MOTORS_DEFAULT_IDLE_THRUST
 #  define DEFAULT_IDLE_THRUST 0
@@ -63,7 +65,9 @@ static uint32_t idleThrust = DEFAULT_IDLE_THRUST;
 struct flapperConfig_s {
   uint8_t pitchServoNeutral;
   uint8_t yawServoNeutral;
-  uint8_t gripServoNeutral;
+  uint8_t gripServoOpen;
+  uint8_t gripServoClosed;
+  uint8_t gripServoState;
   int8_t rollBias;
   uint16_t maxThrust;
 };
@@ -71,7 +75,9 @@ struct flapperConfig_s {
 struct flapperConfig_s flapperConfig = {
   .pitchServoNeutral = 50,
   .yawServoNeutral = 50,
-  .gripServoNeutral = 50,
+  .gripServoOpen = 75,
+  .gripServoClosed = 25,
+  .gripServoState = 0,
   .rollBias = 0,
   .maxThrust = 60000,
 };
@@ -119,9 +125,14 @@ uint8_t flapperConfigYawNeutral(void)
   return limitServoNeutral(flapperConfig.yawServoNeutral);
 }
 
-uint8_t flapperConfigGripNeutral(void)
+uint8_t flapperConfigGripClosed(void)
 {
-  return limitServoNeutral(flapperConfig.gripServoNeutral);
+  return flapperConfig.gripServoClosed;
+}
+
+uint8_t flapperConfigGripOpen(void)
+{
+  return flapperConfig.gripServoOpen;
 }
 
 int8_t flapperConfigRollBias(void)
@@ -129,14 +140,14 @@ int8_t flapperConfigRollBias(void)
   return limitServoNeutral(flapperConfig.rollBias);
 }
 
+void flapperSetGripServoState(uint8_t value)
+{
+  flapperConfig.gripServoState = value;
+}
+
 void powerDistributionInit(void)
 {
-  #if CONFIG_POWER_DISTRIBUTION_FLAPPER_REVB
-    DEBUG_PRINT("Using Flapper power distribution | PCB revB (2021)\n");
-  #else
-    DEBUG_PRINT("Using Flapper power distribution | PCB revD (2022) or newer\n");
-  #endif
-  
+    DEBUG_PRINT("Using Flapper power distribution | PCB revD (2022) or newer, with gripper\n");
 }
 
 bool powerDistributionTest(void)
@@ -150,16 +161,22 @@ bool powerDistributionTest(void)
 uint16_t * powerDistribution(const control_t *control)
 {
   static uint16_t motorPower[NBR_OF_MOTORS];
+  static uint8_t gripServoPosition;
+  static uint8_t gripServoState;
   thrust = fmin(control->thrust, flapperConfig.maxThrust);
-  
-  flapperConfig.pitchServoNeutral=limitServoNeutral(flapperConfig.pitchServoNeutral);
-  flapperConfig.yawServoNeutral=limitServoNeutral(flapperConfig.yawServoNeutral);
+
+  if (getCPPMAux1Value() || getExtRxAux1Value() || (flapperConfig.gripServoState > 0)) gripServoState = 1;
+  else gripServoState = 0;
+    
+  flapperConfig.pitchServoNeutral = limitServoNeutral(flapperConfig.pitchServoNeutral);
+  flapperConfig.yawServoNeutral = limitServoNeutral(flapperConfig.yawServoNeutral);
+  gripServoPosition = flapperConfig.gripServoOpen * flapperConfig.gripServoState + flapperConfig.gripServoClosed * (1 - flapperConfig.gripServoState);
 
   motorPower[SERVO_PITCH] = limitThrust(flapperConfig.pitchServoNeutral*act_max/100.0f + pitch_ampl*control->pitch); // pitch servo
   motorPower[SERVO_YAW] = limitThrust(flapperConfig.yawServoNeutral*act_max/100.0f - control->yaw); // yaw servo
   motorPower[MOTOR_LEFT] = limitThrust( 0.5f * control->roll + thrust * (1.0f + flapperConfig.rollBias/100.0f) ); // left motor
   motorPower[MOTOR_RIGHT] = limitThrust(-0.5f * control->roll + thrust * (1.0f - flapperConfig.rollBias/100.0f) ); // right motor
-  motorPower[SERVO_GRIPPER] = limitThrust(flapperConfig.gripServoNeutral*act_max/100.0f ); // gripper servo
+  motorPower[SERVO_GRIPPER] = limitThrust(gripServoPosition*act_max/100.0f); // gripper servo
     
   if (motorPower[MOTOR_LEFT] < idleThrust) {
     motorPower[MOTOR_LEFT] = idleThrust;
@@ -214,12 +231,23 @@ PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, servPitchNeutr, &flapperConfig.pitchSe
  */
 PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, servYawNeutr, &flapperConfig.yawServoNeutral)
 /**
- * @brief Grip servo neutral <25%; 75%> (default 50%)
+ * @brief Gripper servo ON position <0%; 100%> (default 75%)
  *
- * The parameter sets the neutral position of the yaw servo, such that the yaw control arm is pointed spanwise. If in flight 
- * you observe drift in the clock-wise direction, increase this parameter and vice-versa if the drift is counter-clock-wise.
+ * The parameter sets the ON position of the gripper servo
  */
-PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, servGripNeutr, &flapperConfig.gripServoNeutral)
+PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, servGripOpen, &flapperConfig.gripServoOpen)
+/**
+ * @brief Gripper servo OFF position <0%; 100%> (default 25%)
+ *
+ * The parameter sets the OFF position of the gripper servo
+ */
+PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, servGripClose, &flapperConfig.gripServoClosed)
+/**
+ * @brief Gripper servo state (default 0)
+ *
+ * The parameter sets the state of the gripper servo
+ */
+PARAM_ADD(PARAM_UINT8, servGripState, &flapperConfig.gripServoState)
 /**
  * @brief Max Thrust <0; 65535> (default 60000)
  *

@@ -23,6 +23,7 @@
  *
  *
  */
+#include "power_distribution.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -171,6 +172,8 @@ static float s_CppmEmuRollMaxAngleDeg = 50.0f; // For level mode
 static float s_CppmEmuPitchMaxAngleDeg = 50.0f; // For level mode
 static float s_CppmEmuYawMaxRateDps = 400.0f; // Used regardless of flight mode
 
+static bool aux1ValueFilt = 0;
+
 struct cppmEmuPacket_s {
   struct {
       uint8_t numAuxChannels : 4;   // Set to 0 through MAX_AUX_RC_CHANNELS
@@ -214,9 +217,15 @@ float getCPPMYawRateScale()
   return s_CppmEmuYawMaxRateDps;
 }
 
+bool getCPPMAux1Value()
+{
+  return aux1ValueFilt;
+}
+
 static void cppmEmuDecoder(setpoint_t *setpoint, uint8_t type, const void *data, size_t datalen)
 {
   bool isSelfLevelEnabled = true;
+  static int aux1_cnt = 0;
 
   ASSERT(datalen >= 9); // minimum 9 bytes expected - 1byte header + four 2byte channels
   const struct cppmEmuPacket_s *values = data;
@@ -225,8 +234,21 @@ static void cppmEmuDecoder(setpoint_t *setpoint, uint8_t type, const void *data,
   // Aux channel 0 is reserved for enabling/disabling self-leveling
   // If it's in use, check and see if it's set and enable self-leveling.
   // If aux channel 0 is not in use, default to self-leveling enabled.
-  isSelfLevelEnabled = !(values->hdr.numAuxChannels >= 1 && values->channelAux[0] < 1500);
+  isSelfLevelEnabled = !(values->hdr.numAuxChannels >= 1 && values->channelAux[0] < 1200);
 
+  // Aux channel 1
+  if (values->channelAux[1] > 1500 && aux1_cnt < 5)
+  {
+    aux1_cnt+=1;
+  }
+  else if (aux1_cnt > 0)
+  {
+    aux1_cnt-=1;
+  }
+  
+  if (aux1_cnt == 0) aux1ValueFilt = 0;
+  if (aux1_cnt == 5) aux1ValueFilt = 1;
+  
   // Set the modes
 
   // Position is disabled

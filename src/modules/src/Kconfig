@@ -167,7 +167,7 @@ config POWER_DISTRIBUTION_OCTO
 endchoice
 config POWER_DISTRIBUTION_FLAPPER_REVB
     bool "Flapper  Nimble+ power distribution (PCB revision B)"
-    depends on POWER_DISTRIBUTION_FLAPPER
+    depends on POWER_DISTRIBUTION_FLAPPER || POWER_DISTRIBUTION_FLAPPERGRIP
     default n
     help
         Power distribution function for Flapper Nimble+ with revB PCB

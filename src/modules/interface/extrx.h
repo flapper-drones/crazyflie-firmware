@@ -28,4 +28,5 @@
 #include <stdint.h>
 
 void extRxInit(void);
+bool getExtRxAux1Value(void);
 

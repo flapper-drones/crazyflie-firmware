@@ -39,5 +39,6 @@ float getCPPMRollRateScale();
 float getCPPMPitchScale();
 float getCPPMPitchRateScale();
 float getCPPMYawRateScale();
+bool getCPPMAux1Value(void);
 
 #endif /* CRTP_COMMANDER_H_ */

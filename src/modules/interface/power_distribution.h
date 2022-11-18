@@ -37,7 +37,14 @@ uint16_t * powerDistribution(const control_t *control);
 int8_t flapperConfigRollBias(void);
 uint8_t flapperConfigPitchNeutral(void);
 uint8_t flapperConfigYawNeutral(void);
-uint8_t flapperConfigGripNeutral(void);
+#endif
+#ifdef CONFIG_POWER_DISTRIBUTION_FLAPPERGRIP
+int8_t flapperConfigRollBias(void);
+uint8_t flapperConfigPitchNeutral(void);
+uint8_t flapperConfigYawNeutral(void);
+uint8_t flapperConfigGripClosed(void);
+uint8_t flapperConfigGripOpen(void);
+void flapperSetGripServoState(uint8_t value);
 #endif
 
 #endif //__POWER_DISTRIBUTION_H__

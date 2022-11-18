@@ -38,6 +38,7 @@
 #include "uart1.h"
 #include "cppm.h"
 #include "crtp_commander.h"
+#include "power_distribution.h"
 
 #define DEBUG_MODULE  "EXTRX"
 #include "debug.h"
@@ -73,10 +74,12 @@
 #define EXTRX_CH_ALTHOLD   4
 #define EXTRX_CH_ARM       5
 #define EXTRX_CH_MODE     6
+#define EXTRX_CH_AUX1     5
 
 #define EXTRX_SIGN_ALTHOLD   (-1)
 #define EXTRX_SIGN_ARM       (-1)
 #define EXTRX_SIGN_MODE       (-1)
+#define EXTRX_SIGN_AUX1       (-1)
 
 #define EXTRX_DEADBAND_ROLL (0.05f)
 #define EXTRX_DEADBAND_PITCH (0.05f)
@@ -87,6 +90,9 @@
 bool extRxArm = false;
 bool extRxAltHold = false;
 bool extRxModeRate = false;
+
+bool extRxAux1 = false;
+int8_t aux1_cnt = 0;
   
 #if CONFIG_DECK_EXTRX_ARMING
   bool extRxArmPrev = false;
@@ -151,6 +157,11 @@ static void extRxTask(void *param)
   }
 }
 
+bool getExtRxAux1Value(void)
+{
+  return extRxAux1;
+}
+
 static void extRxDecodeChannels(void)
 {
   
@@ -180,6 +191,18 @@ static void extRxDecodeChannels(void)
 
   extRxArmPrev = extRxArm;
   #endif
+
+  if (EXTRX_SIGN_AUX1 * cppmConvert2Float(ch[EXTRX_CH_AUX1], -1, 1, 0.0) > 0.5f) // channel needs to be 75% or more to work correctly with 2/3 way switches
+  {
+    if (aux1_cnt < EXTRX_SWITCH_MIN_CNT) aux1_cnt++;
+    else extRxAux1 = true;
+    
+  }
+  else
+  {
+    if (aux1_cnt > 0) aux1_cnt--;
+    else extRxAux1 = false;
+  }
 
   #if CONFIG_DECK_EXTRX_ALT_HOLD
   if (EXTRX_SIGN_ALTHOLD * cppmConvert2Float(ch[EXTRX_CH_ALTHOLD], -1, 1, 0.0) > 0.5f)
