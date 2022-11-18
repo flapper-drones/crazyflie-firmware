@@ -169,7 +169,7 @@ GPIO_InitTypeDef GPIO_PassthroughOutput =
 float motorsCompensateBatteryVoltage(uint32_t id, float iThrust, float supplyVoltage)
 {
   #ifdef CONFIG_ENABLE_THRUST_BAT_COMPENSATED
-  ASSERT(id < STABILIZER_NBR_OF_MOTORS);
+  ASSERT(id < NBR_OF_MOTORS);
 
   if (motorMap[id]->drvType == BRUSHED)
   {
@@ -460,7 +460,7 @@ void motorsBurstDshot()
 void motorsSetRatio(uint32_t id, uint16_t ithrust)
 {
   if (isInit) {
-    ASSERT(id < STABILIZER_NBR_OF_MOTORS);
+    ASSERT(id < NBR_OF_MOTORS);
 
     uint16_t ratio = ithrust;
 

@@ -83,6 +83,11 @@ config PLATFORM_FLAPPER
     select SENSORS_BMI088_BMP388
     select SENSORS_BMI088_SPI
 
+config PLATFORM_OCTO
+    bool "Build for a Coaxial Octocopter"
+    select SENSORS_BMI088_BMP388
+    select SENSORS_BMI088_SPI
+
 endchoice
 
 endmenu

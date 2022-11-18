@@ -148,6 +148,11 @@ config POWER_DISTRIBUTION_QUADROTOR
     depends on PLATFORM_CF2 || PLATFORM_BOLT || PLATFORM_TAG
     help
         Power distribution function for quadrotors
+config POWER_DISTRIBUTION_OCTO
+    bool "Coaxial Octocopter power distribution"
+    depends on PLATFORM_OCTO
+    help
+        Power distribution function for coaxial octocopters
 config POWER_DISTRIBUTION_FLAPPER
     bool "Flapper Nimble+ power distribution"
     depends on PLATFORM_FLAPPER
