@@ -253,11 +253,13 @@ extern const MotorPerifDef* motorMapBigQuadDeck[4];
 extern const MotorPerifDef* motorMapBoltBrushless[4];
 extern const MotorPerifDef* motorMapBolt11Brushless[4];
 extern const MotorPerifDef* motorMapCF21Brushless[4];
+extern const MotorPerifDef* motorMapOctoBolt[8];
+extern const MotorPerifDef* motorMapOctoBolt11[8];
 
 /**
  * Test sound tones
  */
-extern const uint16_t testsound[STABILIZER_NBR_OF_MOTORS];
+extern const uint16_t testsound[NBR_OF_MOTORS];
 /*** Public interface ***/
 
 /**

@@ -624,7 +624,7 @@ void motorsPlayMelody(uint16_t *notes)
 
 const MotorHealthTestDef* motorsGetHealthTestSettings(uint32_t id)
 {
-  if (id >= STABILIZER_NBR_OF_MOTORS)
+  if (id >= NBR_OF_MOTORS)
   {
     return &unknownMotorHealthTestSettings;
   }
