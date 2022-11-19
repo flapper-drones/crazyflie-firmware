@@ -170,7 +170,7 @@ uint16_t * powerDistribution(const control_t *control)
     
   flapperConfig.pitchServoNeutral = limitServoNeutral(flapperConfig.pitchServoNeutral);
   flapperConfig.yawServoNeutral = limitServoNeutral(flapperConfig.yawServoNeutral);
-  gripServoPosition = flapperConfig.gripServoOpen * flapperConfig.gripServoState + flapperConfig.gripServoClosed * (1 - flapperConfig.gripServoState);
+  gripServoPosition = flapperConfig.gripServoOpen * gripServoState + flapperConfig.gripServoClosed * (1 - gripServoState);
 
   motorPower[SERVO_PITCH] = limitThrust(flapperConfig.pitchServoNeutral*act_max/100.0f + pitch_ampl*control->pitch); // pitch servo
   motorPower[SERVO_YAW] = limitThrust(flapperConfig.yawServoNeutral*act_max/100.0f - control->yaw); // yaw servo

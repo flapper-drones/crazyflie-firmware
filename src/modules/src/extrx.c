@@ -432,5 +432,9 @@ LOG_ADD(LOG_UINT8, AltHold, &extRxAltHold)
  * @brief External RX Arming signal
  */
 LOG_ADD(LOG_UINT8, Arm, &extRxArm)
+/**
+ * @brief External RX Arming signal
+ */
+LOG_ADD(LOG_UINT8, Aux1, &extRxAux1)
 LOG_GROUP_STOP(extrx)
 #endif
