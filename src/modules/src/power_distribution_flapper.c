@@ -38,6 +38,8 @@
 #include "math.h"
 #include "cfassert.h"
 
+#include "filter.h"
+
 #ifndef CONFIG_MOTORS_DEFAULT_IDLE_THRUST
 #  define DEFAULT_IDLE_THRUST 0
 #else
@@ -49,21 +51,31 @@ static uint32_t idleThrust = DEFAULT_IDLE_THRUST;
 struct flapperConfig_s {
   uint8_t pitchServoNeutral;
   uint8_t yawServoNeutral;
-  int8_t rollBias;
   uint16_t maxThrust;
+  float rollCutoff;
+  float pitchCutoff;
+  float yawCutoff;
 };
 
 struct flapperConfig_s flapperConfig = {
   .pitchServoNeutral = 50,
   .yawServoNeutral = 50,
-  .rollBias = 0,
   .maxThrust = 60000,
+  .rollCutoff = 20.0,
+  .pitchCutoff = 20.0,
+  .yawCutoff = 5.0,
 };
 
 static float thrust;
 static uint16_t act_max = 65535;
+static uint16_t cmd_max = 32767;
 
-static float pitch_ampl = 0.4f; // 1 = full servo stroke
+static float pitch_ampl = 0.4; // 1 is full servo stroke, negative to flip the servo direction
+static float yaw_ampl = 1.0;
+
+static lpf2pData rollLpf;
+static lpf2pData pitchLpf;
+static lpf2pData yawLpf;
 
 #if CONFIG_POWER_DISTRIBUTION_FLAPPER_REVB
   uint32_t idPitch = 1;
@@ -82,20 +94,6 @@ static uint8_t limitServoNeutral(uint8_t value)
   else if(value < 25)
   {
     value = 25;
-  }
-
-  return (uint8_t)value;
-}
-
-static int8_t limitRollBias(uint8_t value)
-{
-  if(value > 25)
-  {
-    value = 25;
-  }
-  else if(value < -25)
-  {
-    value = -25;
   }
 
   return (uint8_t)value;
@@ -157,6 +155,23 @@ uint16_t limitThrust(int32_t value, int32_t min, int32_t max, bool* isCapped)
   return value;
 }
 
+float limitCmd(float value)
+{
+  if (value < -cmd_max) {
+    return -cmd_max;
+  }
+
+  if (value > cmd_max) {
+    return cmd_max;
+  }
+
+  return value;
+}
+
+static int16_t cmdRoll = 0;
+static int16_t cmdPitch = 0;
+static int16_t cmdYaw = 0;
+
 void powerDistribution(const control_t *control, motors_thrust_uncapped_t* motorThrustUncapped)
 {
   // Only legacy mode is currently supported
@@ -166,18 +181,34 @@ void powerDistribution(const control_t *control, motors_thrust_uncapped_t* motor
 
   flapperConfig.pitchServoNeutral=limitServoNeutral(flapperConfig.pitchServoNeutral);
   flapperConfig.yawServoNeutral=limitServoNeutral(flapperConfig.yawServoNeutral);
-  flapperConfig.rollBias=limitRollBias(flapperConfig.rollBias);
 
+  if (thrust > 0)
+  {
+    cmdRoll = limitCmd(lpf2pApply(&rollLpf, control->roll));
+    cmdPitch = limitCmd(lpf2pApply(&pitchLpf, control->pitch));
+    cmdYaw = limitCmd(lpf2pApply(&yawLpf, control->yaw));
+  }
+  else
+  {
+    cmdRoll = 0;
+    cmdPitch = 0;
+    cmdYaw = 0;
+    
+    lpf2pInit(&rollLpf, RATE_MAIN_LOOP, flapperConfig.rollCutoff);
+    lpf2pInit(&pitchLpf, RATE_MAIN_LOOP, flapperConfig.pitchCutoff);
+    lpf2pInit(&yawLpf, RATE_MAIN_LOOP, flapperConfig.yawCutoff);
+  }
+  
   #if CONFIG_POWER_DISTRIBUTION_FLAPPER_REVB
-    motorThrustUncapped->motors.m2 = flapperConfig.pitchServoNeutral*act_max / 100.0f + pitch_ampl * control->pitch; // pitch servo
-    motorThrustUncapped->motors.m3 = flapperConfig.yawServoNeutral*act_max / 100.0f - control->yaw; // yaw servo
-    motorThrustUncapped->motors.m1 =  0.5f * control->roll + thrust * (1.0f + flapperConfig.rollBias / 100.0f); // left motor
-    motorThrustUncapped->motors.m4 = -0.5f * control->roll + thrust * (1.0f - flapperConfig.rollBias / 100.0f); // right motor
+    motorThrustUncapped->motors.m2 = flapperConfig.pitchServoNeutral*act_max / 100.0f + 1.0f * pitch_ampl * cmdPitch; // pitch servo
+    motorThrustUncapped->motors.m3 = flapperConfig.yawServoNeutral*act_max / 100.0f - 1.0f * yaw_ampl * cmdYaw; // yaw servo
+    motorThrustUncapped->motors.m1 =  0.5f * cmdRoll + 1.0f * thrust; // left motor
+    motorThrustUncapped->motors.m4 = -0.5f * cmdRoll + 1.0f * thrust; // right motor
   #else
-    motorThrustUncapped->motors.m1 = flapperConfig.pitchServoNeutral * act_max / 100.0f + pitch_ampl * control->pitch; // pitch servo
-    motorThrustUncapped->motors.m3 = flapperConfig.yawServoNeutral*act_max / 100.0f - control->yaw; // yaw servo
-    motorThrustUncapped->motors.m2 =  0.5f * control->roll + thrust * (1.0f + flapperConfig.rollBias / 100.0f); // left motor
-    motorThrustUncapped->motors.m4 = -0.5f * control->roll + thrust * (1.0f - flapperConfig.rollBias / 100.0f); // right motor
+    motorThrustUncapped->motors.m1 = flapperConfig.pitchServoNeutral*act_max / 100.0f + 1.0f * pitch_ampl * cmdPitch; // pitch servo
+    motorThrustUncapped->motors.m3 = flapperConfig.yawServoNeutral*act_max / 100.0f - 1.0f * yaw_ampl * cmdYaw; // yaw servo
+    motorThrustUncapped->motors.m2 =  0.5f * cmdRoll + 1.0f * thrust; // left motor
+    motorThrustUncapped->motors.m4 = -0.5f * cmdRoll + 1.0f * thrust; // right motor
   #endif
 }
 
@@ -230,14 +261,6 @@ PARAM_GROUP_STOP(powerDist)
  */
 PARAM_GROUP_START(flapper)
 /**
- * @brief Roll bias <-25%; 25%> (default 0%)
- *
- * This parameter can be used if uneven performance of the left and right flapping mechanaisms and/or wings
- * is observed, which in flight results in a drift in roll/sideways flight. Positive values make the drone roll
- * more to the right, negative values to the left.
- */
-PARAM_ADD(PARAM_INT8 | PARAM_PERSISTENT, motBiasRoll, &flapperConfig.rollBias)
-/**
  * @brief Pitch servo neutral <25%; 75%> (default 50%)
  *
  * The parameter sets the neutral position of the pitch servo, such that the left and right wing-pairs are
@@ -253,11 +276,28 @@ PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, servPitchNeutr, &flapperConfig.pitchSe
  */
 PARAM_ADD(PARAM_UINT8 | PARAM_PERSISTENT, servYawNeutr, &flapperConfig.yawServoNeutral)
 /**
- * @brief Yaw servo neutral <25%; 75%> (default 50%)
+ * @brief Maximal thrust (default 60000)
  *
- * The parameter sets the neutral position of the yaw servo, such that the yaw control arm is pointed spanwise. If in flight
- * you observe drift in the clock-wise direction, increase this parameter and vice-versa if the drift is counter-clock-wise.
+ * The parameter sets the maximal thrust, lowering the value will leave higher margin for roll control
  */
 PARAM_ADD(PARAM_UINT16 | PARAM_PERSISTENT, flapperMaxThrust, &flapperConfig.maxThrust)
+/**
+ * @brief Roll filter cutoff frequency in Hz (default 20)
+ *
+ * The parameter sets the cutoff frequency of roll command filter.
+ */
+PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, rollCut, &flapperConfig.rollCutoff)
+/**
+ * @brief Pitch filter cutoff frequency in Hz (default 20)
+ *
+ * The parameter sets the cutoff frequency of pitch command filter.
+ */
+PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, pitchCut, &flapperConfig.pitchCutoff)
+/**
+ * @brief Yaw filter cutoff frequency in Hz (default 5)
+ *
+ * The parameter sets the cutoff frequency of yaw command filter.
+ */
+PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, yawCut, &flapperConfig.yawCutoff)
 
 PARAM_GROUP_STOP(flapper)
