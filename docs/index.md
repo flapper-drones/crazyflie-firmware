@@ -15,6 +15,7 @@ This firmware supports the Crazyflie 2.x range of devices, currently including:
 * The Crazyflie Bolt 1.1 (`bolt` platform)
 * The Roadrunner (`tag` platform)
 * The Flapper Nimble+ (`flapper` platform)
+* The Flapper Nimble Triple (`flapper3` platform)
 
 ### Crazyflie 1.0
 

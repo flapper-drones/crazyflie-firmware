@@ -88,6 +88,11 @@ config PLATFORM_FLAPPER
     select SENSORS_BMI088_BMP3XX
     select SENSORS_BMI088_SPI
 
+config PLATFORM_FLAPPER3
+    bool "Build for Flapper Nimble Triple"
+    select SENSORS_BMI088_BMP3XX
+    select SENSORS_BMI088_SPI
+
 endchoice
 
 config BOLT11_BRUSHED

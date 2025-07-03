@@ -196,7 +196,11 @@ config POWER_DISTRIBUTION_FLAPPER
     depends on PLATFORM_FLAPPER
     help
         Power distribution function for Flapper Nimble+
-
+config POWER_DISTRIBUTION_FLAPPER3
+    bool "Flapper Nimble Triple power distribution"
+    depends on PLATFORM_FLAPPER3
+    help
+        Power distribution function for Flapper Nimble Triple
 endchoice
 config POWER_DISTRIBUTION_FLAPPER_REVB
     bool "Flapper  Nimble+ power distribution (PCB revision B)"
