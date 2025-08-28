@@ -154,9 +154,9 @@
 #define YAW_MAX_DELTA 30.0
 
 // EKF defaults
-#ifndef EKF_DRAG_BX
-    #define EKF_DRAG_BX 4.2f
-#endif
-#ifndef EKF_DRAG_BY
-    #define EKF_DRAG_BY 1.8f
-#endif
+#define EKF_DRAG_BX 4.2f
+#define EKF_DRAG_BY 1.8f
+#define EKF_DRAG_BZ 0.9f
+#define EKF_DRAG_RX 0.0f
+#define EKF_DRAG_RY 0.0f
+#define EKF_DRAG_RZ 0.11f
