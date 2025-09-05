@@ -186,3 +186,10 @@
 #endif
 
 
+// EKF defaults
+#ifndef EKF_DRAG_BX
+    #define EKF_DRAG_BX 0.0f
+#endif
+#ifndef EKF_DRAG_BY
+    #define EKF_DRAG_BY 0.0f
+#endif

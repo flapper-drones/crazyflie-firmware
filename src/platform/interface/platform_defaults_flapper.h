@@ -152,3 +152,11 @@
 #define SUPERVISOR_TUMBLE_CHECK_ACCEPTED_UPSIDEDOWN_TIME 200
 
 #define YAW_MAX_DELTA 30.0
+
+// EKF defaults
+#ifndef EKF_DRAG_BX
+    #define EKF_DRAG_BX 4.2f
+#endif
+#ifndef EKF_DRAG_BY
+    #define EKF_DRAG_BY 1.8f
+#endif

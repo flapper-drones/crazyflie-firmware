@@ -58,6 +58,8 @@
 #include "kalman_core.h"
 #include "cfassert.h"
 #include "autoconf.h"
+#include "platform_defaults.h"
+#include "param.h"
 
 #include "physicalConstants.h"
 
@@ -73,6 +75,10 @@
 #define ROLLPITCH_ZERO_REVERSION (0.001f)
 #endif
 
+
+// The drag coefficients, used to model the drag on the flapper
+float dragBx = EKF_DRAG_BX; // drag on the X axis 
+float dragBy = EKF_DRAG_BY; // drag on the Y axis
 
 /**
  * Supporting and utility functions
@@ -131,8 +137,13 @@ void kalmanCoreDefaultParams(kalmanCoreParams_t* params)
   params->stdDevInitialAttitude_rollpitch = 0.01;
   params->stdDevInitialAttitude_yaw = 0.01;
 
+  #ifdef CONFIG_ESTIMATOR_KALMAN_GENERAL_PURPOSE
+  params->procNoiseAcc_xy = 0.5f;
+  params->procNoiseAcc_z = 0.5f;
+  #else
   params->procNoiseAcc_xy = 0.5f;
   params->procNoiseAcc_z = 1.0f;
+  #endif
   params->procNoiseVel = 0;
   params->procNoisePos = 0;
   params->procNoiseAtt = 0;
@@ -150,6 +161,7 @@ void kalmanCoreDefaultParams(kalmanCoreParams_t* params)
   // PI --- facing negative X
   // 3 * PI / 2 --- facing negative Y
   params->initialYaw = 0.0;
+
 }
 
 void kalmanCoreInit(kalmanCoreData_t *this, const kalmanCoreParams_t *params, const uint32_t nowMs)
@@ -411,12 +423,12 @@ static void predictDt(kalmanCoreData_t* this, Axis3f *acc, Axis3f *gyro, float d
   A[KC_STATE_Z][KC_STATE_D2] = (this->S[KC_STATE_PX]*this->R[2][1] - this->S[KC_STATE_PY]*this->R[2][0])*dt;
 
   // body-frame velocity from body-frame velocity
-  A[KC_STATE_PX][KC_STATE_PX] = 1; //drag negligible
+  A[KC_STATE_PX][KC_STATE_PX] = 1 - dt * dragBx; //drag negligible
   A[KC_STATE_PY][KC_STATE_PX] =-gyro->z*dt;
   A[KC_STATE_PZ][KC_STATE_PX] = gyro->y*dt;
 
   A[KC_STATE_PX][KC_STATE_PY] = gyro->z*dt;
-  A[KC_STATE_PY][KC_STATE_PY] = 1; //drag negligible
+  A[KC_STATE_PY][KC_STATE_PY] = 1 - dt * dragBy; //drag negligible
   A[KC_STATE_PZ][KC_STATE_PY] =-gyro->x*dt;
 
   A[KC_STATE_PX][KC_STATE_PZ] =-gyro->y*dt;
@@ -504,8 +516,10 @@ static void predictDt(kalmanCoreData_t* this, Axis3f *acc, Axis3f *gyro, float d
     tmpSPZ = this->S[KC_STATE_PZ];
 
     // body-velocity update: accelerometers - gyros cross velocity - gravity in body frame
-    this->S[KC_STATE_PX] += dt * (gyro->z * tmpSPY - gyro->y * tmpSPZ - GRAVITY_MAGNITUDE * this->R[2][0]);
-    this->S[KC_STATE_PY] += dt * (-gyro->z * tmpSPX + gyro->x * tmpSPZ - GRAVITY_MAGNITUDE * this->R[2][1]);
+    this->S[KC_STATE_PX] += dt * (gyro->z * tmpSPY - gyro->y * tmpSPZ - GRAVITY_MAGNITUDE * this->R[2][0]
+                               - dragBx * tmpSPX);
+    this->S[KC_STATE_PY] += dt * (-gyro->z * tmpSPX + gyro->x * tmpSPZ - GRAVITY_MAGNITUDE * this->R[2][1]
+                               - dragBy * tmpSPY);
     this->S[KC_STATE_PZ] += dt * (zacc + gyro->y * tmpSPX - gyro->x * tmpSPY - GRAVITY_MAGNITUDE * this->R[2][2]);
   }
   else // Acceleration can be in any direction, as measured by the accelerometer. This occurs, eg. in freefall or while being carried.
@@ -810,3 +824,16 @@ void kalmanCoreDecoupleXY(kalmanCoreData_t* this)
   decoupleState(this, KC_STATE_Y);
   decoupleState(this, KC_STATE_PY);
 }
+
+PARAM_GROUP_START(kalman)
+
+/**
+ * @brief drag in x direction
+ */
+PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, dragBx, &dragBx)
+/**
+ * @brief drag in y direction
+ */
+PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, dragBy, &dragBy)
+
+PARAM_GROUP_STOP(kalman)
