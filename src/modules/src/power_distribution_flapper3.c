@@ -7,7 +7,7 @@
  *
  * Crazyflie control firmware
  *
- * Copyright (C) 2022 Bitcraze AB & Flapper Drones (https:\\flapper-drones.com)
+ * Copyright (C) 2025 Bitcraze AB & Flapper Drones (https:\\flapper-drones.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

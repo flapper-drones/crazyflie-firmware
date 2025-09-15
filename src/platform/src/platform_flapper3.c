@@ -39,7 +39,7 @@ static platformConfig_t configs[] = {
 #ifdef CONFIG_SENSORS_BMI088_BMP3XX
   {
     .deviceType = "CF21",
-    .deviceTypeName = "Flapper (CF 2.1)",
+    .deviceTypeName = "Flapper Nimble Triple CF21",
     .sensorImplementation = SensorImplementation_bmi088_bmp3xx,
     .physicalLayoutAntennasAreClose = true,
     .motorMap = motorMapDefaltConBrushless,
@@ -48,14 +48,14 @@ static platformConfig_t configs[] = {
 #ifdef CONFIG_SENSORS_BMI088_SPI
   {
     .deviceType = "CB10",
-    .deviceTypeName = "Flapper (Bolt 1.0)",
+    .deviceTypeName = "Flapper Nimble Triple CB10",
     .sensorImplementation = SensorImplementation_bmi088_spi_bmp3xx,
     .physicalLayoutAntennasAreClose = false,
     .motorMap = motorMapBoltBrushless,
   },
   {
     .deviceType = "CB11",
-    .deviceTypeName = "Flapper (Bolt 1.1)",
+    .deviceTypeName = "Flapper Nimble Triple",
     .sensorImplementation = SensorImplementation_bmi088_spi_bmp3xx,
     .physicalLayoutAntennasAreClose = false,
     .motorMap = motorMapBolt11Brushless,
