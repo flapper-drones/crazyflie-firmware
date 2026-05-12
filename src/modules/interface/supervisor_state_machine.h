@@ -57,6 +57,7 @@ typedef enum {
   supervisorConditionRPMatArmingValid,
   supervisorConditionSpinupTimeout,
   supervisorConditionMotorsNotResponding,
+  supervisorConditionResetRequest,
   supervisorCondition_NrOfConditions,
 } supervisorConditions_t;
 
@@ -77,6 +78,7 @@ typedef uint32_t supervisorConditionBits_t;
 #define SUPERVISOR_CB_RPM_AT_ARMING_VALID (1 << supervisorConditionRPMatArmingValid)
 #define SUPERVISOR_CB_SPINUP_TIMEOUT (1 << supervisorConditionSpinupTimeout)
 #define SUPERVISOR_CB_MOTORS_NOT_RESPONDING (1 << supervisorConditionMotorsNotResponding)
+#define SUPERVISOR_CB_RESET_REQUEST (1 << supervisorConditionResetRequest) // Special condition that is not set by the supervisor itself, but can be used in the state machine to trigger a reset from the locked state
 
 
 // Enum that is used to describe how to combine the bits in the required field

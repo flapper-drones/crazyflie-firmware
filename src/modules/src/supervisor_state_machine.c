@@ -66,6 +66,7 @@ static const char* const conditionNames[] = {
   "rpmAtArmingValid",
   "spinupTimeout",
   "motorsNotResponding",
+  "isLocked",
 };
 static_assert(sizeof(conditionNames) / sizeof(conditionNames[0]) == supervisorCondition_NrOfConditions);
 
@@ -324,6 +325,15 @@ static SupervisorStateTransition_t transitionsExceptFreeFall[] = {
 };
 
 static SupervisorStateTransition_t transitionsLocked[] = {
+  {
+    .newState = supervisorStateReset,
+
+    .triggers = SUPERVISOR_CB_RESET_REQUEST,
+    .negatedTriggers = SUPERVISOR_CB_NONE,
+    .triggerCombiner = supervisorAny,
+
+    .blockerCombiner = supervisorNever,
+  },
   {
     .newState = supervisorStateLocked,
 

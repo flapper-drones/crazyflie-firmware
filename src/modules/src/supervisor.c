@@ -432,7 +432,11 @@ static void postTransitionActions(SupervisorMem_t* this, const supervisorState_t
   }
 
   if (newState == supervisorStateLocked) {
-    DEBUG_PRINT("Locked, reboot required\n");
+    DEBUG_PRINT("Locked, reset required\n");
+  }
+
+  if (newState == supervisorStateReset) {
+    DEBUG_PRINT("Resetting\n");
   }
 
   if (newState == supervisorStateCrashed) {
@@ -457,6 +461,8 @@ static void postTransitionActions(SupervisorMem_t* this, const supervisorState_t
 }
 
 uint8_t tumbleCheckEnabled = SUPERVISOR_TUMBLE_CHECK_ENABLE;
+static uint8_t lockResetRequest = 0;
+
 
 static supervisorConditionBits_t updateAndPopulateConditions(SupervisorMem_t* this, const sensorData_t *sensors, const setpoint_t* setpoint, const uint32_t currentTick) {
   supervisorConditionBits_t conditions = 0;
@@ -509,6 +515,19 @@ static supervisorConditionBits_t updateAndPopulateConditions(SupervisorMem_t* th
   if (supervisorIsLandingTimeout(this, currentTick)) {
     conditions |= SUPERVISOR_CB_LANDING_TIMEOUT;
   }
+
+  if (this->state == supervisorStateLocked) {
+    if (lockResetRequest) {
+      lockResetRequest = 0;
+      conditions |= SUPERVISOR_CB_RESET_REQUEST;
+    } 
+  }
+
+#ifdef CONFIG_DECK_SUPERVISOR
+  if (deckSupervisorHasFault()) {
+    conditions |= SUPERVISOR_CB_DECK_FAULT;
+  }
+#endif
 
 #ifdef CONFIG_DECK_SUPERVISOR
   if (deckSupervisorHasFault()) {
@@ -764,5 +783,10 @@ PARAM_ADD(PARAM_UINT16 | PARAM_PERSISTENT, spinupTimeout, &armingSpinupTimeoutDu
  * Maximum allowed | |acc| - 1G | for tumble/crash detection. Set to 0 to disable.
  */
 PARAM_ADD(PARAM_FLOAT | PARAM_PERSISTENT, crashDetectGs, &crashDetectionGs)
+
+/**
+ * @brief Set to one to recover from the locked state
+ */
+PARAM_ADD(PARAM_UINT8, lockReset, &lockResetRequest)
 
 PARAM_GROUP_STOP(supervisor)
