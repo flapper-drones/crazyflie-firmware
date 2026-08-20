@@ -59,7 +59,12 @@ struct flapperConfig_s flapperConfig = {
 static float thrust;
 static uint16_t act_max = 65535;
 
-uint32_t idYaw = 1;
+#if CONFIG_POWER_DISTRIBUTION_FLAPPER3_REVB
+  static uint32_t idYaw = 2;
+#else
+  static uint32_t idYaw = 1;
+#endif
+
 
 static uint8_t limitServoNeutral(uint8_t value)
 {
@@ -99,7 +104,11 @@ uint16_t powerDistributionStopRatio(uint32_t id)
 
 void powerDistributionInit(void)
 {
-  DEBUG_PRINT("Using Flapper Triple power distribution\n");
+#if CONFIG_POWER_DISTRIBUTION_FLAPPER3_REVB
+  DEBUG_PRINT("Using Flapper Nimble Triple power distribution | PCB revB\n");
+#else
+  DEBUG_PRINT("Using Flapper Nimble Triple power distribution | PCB revC and newer / revA)\n");
+#endif
 }
 
 bool powerDistributionTest(void)
@@ -132,11 +141,28 @@ void powerDistribution(const control_t *control, motors_thrust_uncapped_t* motor
   flapperConfig.yawServoNeutral=limitServoNeutral(flapperConfig.yawServoNeutral);
 
   static float sqrtOf3=1.73205;
-  motorThrustUncapped->motors.m2 = flapperConfig.yawServoNeutral*act_max/100.0f + 0.7f*control->yaw; // yaw servo
+
+#if CONFIG_POWER_DISTRIBUTION_FLAPPER3_SERVO_INVERTED
+  float yawSign = 1.0f;
+#else
+  float yawSign = -1.0f;
+#endif
+  
+#if CONFIG_POWER_DISTRIBUTION_FLAPPER3_REVB
+{
+  motorThrustUncapped->motors.m3 = flapperConfig.yawServoNeutral*act_max/100.0f + yawSign*0.7f*control->yaw; // yaw servo
+
+  motorThrustUncapped->motors.m2 = - sqrtOf3/3.0f * control->pitch + thrust; // rear motor
+  motorThrustUncapped->motors.m1 = 0.5f * control->roll + sqrtOf3/6.0f * control->pitch + thrust; // left motor
+  motorThrustUncapped->motors.m4 = -0.5f * control->roll + sqrtOf3/6.0f * control->pitch + thrust; // right motor
+}
+#else
+  motorThrustUncapped->motors.m2 = flapperConfig.yawServoNeutral*act_max/100.0f + yawSign*0.7f*control->yaw; // yaw servo
 
   motorThrustUncapped->motors.m4 = - sqrtOf3/3.0f * control->pitch + thrust; // rear motor
   motorThrustUncapped->motors.m1 = 0.5f * control->roll + sqrtOf3/6.0f * control->pitch + thrust; // left motor
   motorThrustUncapped->motors.m3 = -0.5f * control->roll + sqrtOf3/6.0f * control->pitch + thrust; // right motor
+#endif
 
 }
 
@@ -144,12 +170,20 @@ bool powerDistributionCap(const motors_thrust_uncapped_t* motorThrustBatCompUnca
 {
   bool isCapped = false;
 
+#if CONFIG_POWER_DISTRIBUTION_FLAPPER3_REVB
+  motorPwm->motors.m3 = limitThrust(motorThrustBatCompUncapped->motors.m3, 0, UINT16_MAX, &isCapped); // yaw servo
+  
+  motorPwm->motors.m2 = limitThrust(motorThrustBatCompUncapped->motors.m2, idleThrust, UINT16_MAX, &isCapped); // rear motor
+  motorPwm->motors.m1 = limitThrust(motorThrustBatCompUncapped->motors.m1, idleThrust, UINT16_MAX, &isCapped); // left motor
+  motorPwm->motors.m4 = limitThrust(motorThrustBatCompUncapped->motors.m4, idleThrust, UINT16_MAX, &isCapped); // right motor
+
+#else
   motorPwm->motors.m2 = limitThrust(motorThrustBatCompUncapped->motors.m2, 0, UINT16_MAX, &isCapped); // yaw servo
   
   motorPwm->motors.m4 = limitThrust(motorThrustBatCompUncapped->motors.m4, idleThrust, UINT16_MAX, &isCapped); // rear motor
   motorPwm->motors.m1 = limitThrust(motorThrustBatCompUncapped->motors.m1, idleThrust, UINT16_MAX, &isCapped); // left motor
   motorPwm->motors.m3 = limitThrust(motorThrustBatCompUncapped->motors.m3, idleThrust, UINT16_MAX, &isCapped); // right motor
-  
+#endif
   return isCapped;
 }
 
